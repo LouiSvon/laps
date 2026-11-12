@@ -1,0 +1,11 @@
+/* LAPS : couleurs et typographie (version test, piste 5). */
+:root{
+  --laps-graphite:#1E2328;   /* texte, structure, fonds foncés */
+  --laps-cyan:#0A7686;       /* boutons, liens, chiffres clés */
+  --laps-gris-froid:#EEF1F3; /* fonds */
+  --laps-lime:#8FBF1F;       /* accent graphique seulement, jamais du texte sur fond clair */
+  --laps-gris-moyen:#5C6670; /* texte secondaire */
+  --laps-cyan-clair:#6FD3E3; /* cyan sur fond foncé */
+  --laps-font:'DM Sans',Arial,sans-serif;       /* Google Fonts, licence libre */
+  --laps-font-data:'DM Mono',Consolas,monospace;
+}

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laps - Tableau de bord, Salon-de-Provence</title>
+<style>
+/* Charte LAPS (test) : piste 5, logo 3, typo DM Sans / DM Mono. Couleurs en variables ci-dessous. */
+:root{
+  --accent:#0A7686;      /* cyan : liens, boutons, chiffres */
+  --accent-text:#ffffff;
+  --ink:#1E2328;         /* graphite */
+  --lime:#8FBF1F;        /* accent graphique, jamais du texte sur fond clair */
+  --bg:#EEF1F3;
+  --bg2:#ffffff;
+  --head:#EEF1F3;
+  --line:#C9D0D6;
+  --line2:#E1E6EA;
+  --text:#1E2328;
+  --muted:#5C6670;
+  --sim:#F4F8DC;
+  --ok:#1B7A43;
+  --warn:#9A5B00;
+  --bad:#B3261E;
+  --heat:10,118,134;
+  --font:'DM Sans',Arial,Helvetica,sans-serif;
+  --mono:'DM Mono',Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box;border-radius:0}
+html,body{height:100%;margin:0}
+body{font:14px/1.45 var(--font);color:var(--text);background:var(--bg);display:flex}
+#side{width:220px;flex:none;background:var(--ink);color:#fff;display:flex;flex-direction:column}
+#brand{padding:18px 16px 14px;border-bottom:1px solid #39424a}
+#brand svg{height:46px;width:auto;display:block}
+#brand small{display:block;margin-top:8px;color:#aab4bc;font-size:12px}
+#tabs{display:flex;flex-direction:column;padding:10px 0;flex:1;overflow:auto}
+#tabs button{background:none;border:0;border-left:4px solid transparent;color:#c8d0d6;text-align:left;padding:9px 16px;font:500 14px var(--font);cursor:pointer}
+#tabs button:hover{background:#2a3138;color:#fff}
+#tabs button[aria-selected="true"]{background:#2a3138;color:#fff;border-left-color:var(--lime);font-weight:700}
+#sidefoot{padding:12px 16px;border-top:1px solid #39424a;color:#8f9aa3;font-size:11px}
+#main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%}
+#titlebar{background:#fff;color:var(--ink);padding:14px 24px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);flex-wrap:wrap;gap:4px}
+#titlebar b{font-size:22px;font-weight:700}
+#stamp{font:12px var(--mono);color:var(--muted)}
+#sim{background:var(--sim);border-bottom:1px solid var(--line);border-left:6px solid var(--lime);padding:6px 24px;font-size:13px}
+#toolbar{background:#fff;border-bottom:1px solid var(--line);padding:10px 24px;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center}
+#toolbar label{color:var(--muted);font-size:12px}
+select,button,input{font:14px var(--font);border:1px solid var(--line);background:#fff;color:var(--text);padding:5px 8px}
+button{background:var(--accent);color:#fff;border-color:var(--accent);cursor:pointer;padding:5px 14px;font-weight:500}
+button:hover{background:#085c69}
+button:focus,select:focus,input:focus,th:focus,tr:focus{outline:2px solid var(--accent);outline-offset:1px}
+#content{flex:1;overflow:auto;padding:20px 24px}
+h2{font-size:15px;font-weight:700;margin:0 0 8px;padding:0 0 0 10px;border-left:5px solid var(--lime)}
+.block{margin-bottom:22px}
+.cols{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.cols>.block{flex:1 1 440px;min-width:0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:22px}
+.kpi{background:#fff;border:1px solid var(--line);border-top:4px solid var(--ink);padding:12px 14px}
+.kpi.a{border-top-color:var(--accent)}.kpi.l{border-top-color:var(--lime)}
+.kpi .v{font:500 30px/1.1 var(--mono);color:var(--accent);margin:4px 0}
+.kpi .t{font-size:12px;color:var(--muted)}
+.kpi .d{font-size:12px;color:var(--muted)}
+table.grid{border-collapse:collapse;width:100%;background:#fff}
+table.grid th,table.grid td{border:0;border-bottom:1px solid var(--line2);padding:7px 10px;text-align:left;white-space:nowrap}
+table.grid th{background:var(--head);color:var(--ink);font-weight:700;font-size:12px;border-bottom:2px solid var(--ink);position:sticky;top:0;cursor:default;user-select:none}
+table.grid th.s{cursor:pointer}
+table.grid th.s:hover{background:#dfe5e9}
+table.grid td.n,table.grid th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+table.grid tbody tr:hover{background:#E6F2F4}
+table.grid tbody tr.sel{background:#CFE7EB !important}
+table.grid tbody tr[data-id]{cursor:pointer}
+.scroll{overflow:auto;border:1px solid var(--line);max-height:420px;background:#fff}
+.wrap{overflow-x:auto;border:1px solid var(--line);background:#fff}
+.wrap table.grid,.scroll table.grid{border:0}
+.st-ok{color:var(--ok);font-weight:bold}
+.st-warn{color:var(--warn);font-weight:bold}
+.st-bad{color:var(--bad);font-weight:bold}
+.up{color:var(--ok)} .down{color:var(--bad)}
+.chart{border:1px solid var(--line);background:#fff;padding:8px}
+.chart svg{display:block;width:100%;height:auto}
+.chart text{font:11px var(--mono);fill:#5C6670}
+.note{color:var(--muted);margin:6px 0 0;font-size:12px}
+fieldset{border:1px solid var(--line);background:#fff;margin:0 0 16px;padding:10px 14px}
+legend{font-weight:bold;padding:0 6px}
+dl.kv{display:grid;grid-template-columns:max-content 1fr;gap:3px 14px;margin:0}
+dl.kv dt{color:var(--muted)} dl.kv dd{margin:0}
+#status{background:#fff;border-top:1px solid var(--line);padding:6px 24px;display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+.heat td.h{text-align:center;padding:2px;min-width:28px;font:11px var(--mono)}
+.legend-line{stroke:var(--accent)}
+@media (max-width:800px){body{flex-direction:column;height:auto}#side{width:auto}#tabs{flex-direction:row;flex-wrap:wrap;padding:4px}#tabs button{border-left:0;border-bottom:4px solid transparent;padding:8px 10px}#tabs button[aria-selected="true"]{border-bottom-color:var(--lime)}#main{height:auto}#content{overflow:visible}}
+@media print{
+  #side,#toolbar{display:none}
+  body{display:block;background:#fff}#main{height:auto}
+  .block{break-inside:avoid}
+  #content{overflow:visible}
+  .scroll{max-height:none;overflow:visible}
+}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap">
+</head>
+<body>
+<noscript>Ce tableau de bord nécessite JavaScript (aucune connexion réseau n'est utilisée).</noscript>
+<div id="side"><div id="brand"><svg viewBox="0 0 220 80"><rect x="10" y="12" width="9" height="56" fill="#fff"/><rect x="25" y="12" width="9" height="56" fill="#fff"/><rect x="40" y="12" width="9" height="56" fill="#fff"/><rect x="55" y="12" width="9" height="56" fill="#6FD3E3"/><rect x="70" y="12" width="9" height="56" fill="#8FBF1F"/><text x="94" y="54" font-size="34" font-weight="700" letter-spacing="3" fill="#fff" font-family="DM Sans,Arial,sans-serif">LAPS</text></svg><small>Collectivité</small></div><div id="tabs" role="tablist" aria-label="Feuilles"></div><div id="sidefoot">Hors ligne. Charte en version test.</div></div>
+<div id="main">
+<div id="titlebar"><span><b>Salon-de-Provence</b> &nbsp; Tableau de bord des passages piétons</span><span id="stamp"></span></div>
+<div id="sim">USAGE SIMULÉ : les carrefours, les rues et les écoles sont réels (OpenStreetMap, Éducation nationale), mais les demandes de temps supplémentaire, les largeurs et les incidents sont simulés. Voir la feuille Notes.</div>
+<div id="toolbar">
+  <span><label for="fPeriod">Période :</label> <select id="fPeriod"><option value="7">7 derniers jours</option><option value="30" selected>30 derniers jours</option><option value="90">90 derniers jours</option></select></span>
+  <span><label for="fType">Type de site :</label> <select id="fType"></select></span>
+  <span><label for="fPass">Passage :</label> <select id="fPass"></select></span>
+  <span><button id="bCsv" type="button">Exporter en CSV</button> <button id="bPrint" type="button">Imprimer</button></span>
+</div>
+<div id="content" role="tabpanel" aria-live="polite"></div>
+<div id="status"><span id="sCount"></span><span id="sPeriod"></span><span>Hors ligne : aucune donnée n'est envoyée</span><span>DONNÉES SIMULÉES</span></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- Paramètres de la simulation (voir feuille Notes) ---------- */
+var ND = 180, NP = 18, TOT = ND*24;
+var PLAFOND = 15;                 /* extension maximale (s), hypothèse */
+var VITESSE = 0.6;                /* m/s, vitesse de marche retenue dans le doc d'équipe */
+var T_H='Hôpital et EHPAD', T_C='Centre-ville et marché', T_E='Abords d\'école', T_A='Autre axe';
+var TYPES = [T_H,T_C,T_E,T_A];
+var PEAK = {7:1,8:1,17:1,18:1};   /* heures de pointe routière (hypothèse) */
+var HW = {};  /* profil horaire de la demande par type (hypothèse) */
+HW[T_H]=[0,0,0,0,0,.2,.6,2,4,5,5,5,4,4,5,5,5,4,3,2,1,.5,.2,0];
+HW[T_C]=[0,0,0,0,0,.5,2,6,8,8,7,6,3,1,1,1,1,.5,0,0,0,0,0,0];
+HW[T_E]=[0,0,0,0,0,0,.2,3,5,1,.5,1,4,3,1,1,5,4,1,0,0,0,0,0];
+HW[T_A]=[0,0,0,0,0,.2,1,3,4,4,4,3,3,3,4,4,3,2,1,.5,0,0,0,0];
+var DF = {};  /* poids par jour de la semaine, lundi à dimanche (hypothèse) */
+DF[T_H]=[1,1,1,1,1,.7,.5];
+DF[T_C]=[.4,.4,1.6,.4,.5,1.2,1.3];   /* marchés : mercredi, samedi, dimanche */
+DF[T_E]=[1,1,.5,1,1,.15,.1];          /* écoles : pas de classe le mercredi après-midi, ni le week-end */
+DF[T_A]=[1,1,1,1,1,.8,.7];
+var BASE = {};  /* demandes par jour et par passage : plage (hypothèse) */
+BASE[T_H]=[30,60];BASE[T_C]=[25,55];BASE[T_E]=[10,30];BASE[T_A]=[8,25];
+/* Carrefours à feux de Salon-de-Provence repérés dans OpenStreetMap (12/11/2026), regroupés par l'équipe.
+   [nom, lat, lon, points de signalisation OSM, type, établissements scolaires à moins de 300 m] */
+var SALON = [
+ ['Route de Grans / Bd de la Reine Jeanne / Av. Paul Bourret',43.63486,5.09003,3,T_E,['Collège Jean Bernard (281 m)']],
+ ['Bd de la Reine Jeanne (est)',43.63445,5.09354,2,T_E,['Collège Jean Bernard (8 m)']],
+ ['Av. du 18 Juin 1940 (ouest)',43.62774,5.10496,3,T_E,['École élémentaire Lurian 2 (134 m)','École élémentaire Lurian 1 (171 m)','École maternelle Lurian (249 m)','Collège Joseph d\'Arbaud (262 m)']],
+ ['Av. du 18 Juin 1940 (est)',43.62798,5.10668,3,T_E,['École élémentaire Lurian 1 (179 m)','École élémentaire Lurian 2 (193 m)','École maternelle Lurian (229 m)']],
+ ['Av. du 18 Juin 1940 (sud)',43.62649,5.10729,2,T_E,['École maternelle Lurian (76 m)','École élémentaire Lurian 1 (98 m)','École élémentaire Lurian 2 (161 m)','Collège Joseph d\'Arbaud (201 m)']],
+ ['Bd du Roi René / Rue Lieutenant Duport',43.63188,5.10005,1,T_A,[]],
+ ['Av. Chaban-Delmas / Chemin de la Pologne',43.64042,5.0577,2,T_A,[]],
+ ['Av. Chaban-Delmas (passage piéton à feux)',43.64045,5.05927,2,T_E,['École élémentaire La Crau-Bel Air (280 m)']],
+ ['Av. Chaban-Delmas / Chemin des Grillons',43.64046,5.06613,4,T_A,[]],
+ ['Av. Raoul Francou / Av. Georges Borel / Bd Glanum',43.64048,5.08314,4,T_E,['Lycée Saint-Jean (80 m)','École maternelle Jules Michelet (144 m)','École élémentaire Jules Michelet (144 m)']],
+ ['Bd de la République / Rue Auguste Girard',43.6405,5.09067,1,T_C,['École maternelle Marceau Ginoux (210 m)','École élémentaire Marceau Ginoux (228 m)']],
+ ['Place Eugène Pelletan / Bd Nostradamus',43.64056,5.09539,2,T_C,['Silvya Terrade (256 m)','Collège la Présentation (281 m)','Lycée de l\'Emperi (299 m)']],
+ ['Bd David / Bd Léopold Coren',43.64401,5.09518,1,T_C,['École élémentaire du boulevard David (29 m)','Lycée professionnel le Rocher (62 m)','Lycée technologique privé Le Rocher (94 m)','École primaire privée La Présentation (153 m)']],
+ ['Av. Julien Fabre / Bd Frédéric Mistral',43.63952,5.10252,1,T_H,['Collège Viala Lacoste (177 m)','École primaire privée Viala-Lacoste (193 m)','École élémentaire Capucins (201 m)']],
+ ['Av. Julien Fabre / Av. Léon Blum',43.63821,5.10224,1,T_H,['École maternelle Capucins (190 m)','École élémentaire Capucins (208 m)']],
+ ['Av. de l\'Europe / Av. G. Cabrier / Av. Julien Fabre / Av. R. Donnadieu',43.64141,5.10302,5,T_H,['Collège Viala Lacoste (131 m)','École primaire privée Viala-Lacoste (158 m)','Collège Jean Moulin (171 m)']],
+ ['Av. de l\'Europe / Rue Paul Conte Devolx',43.64406,5.10249,3,T_E,['Collège Jean Moulin (187 m)']],
+ ['Av. du Maréchal Leclerc / Promenade des Tamaris',43.63873,5.11477,1,T_A,[]]
+];
+/* Établissements scolaires de la commune (annuaire de l'éducation) : [nom, type, lat, lon] */
+var ECOLES = [
+['École élémentaire Les Bressons','É',43.64449,5.09026],['École élémentaire Jules Michelet','É',43.64124,5.08458],['École élémentaire Capucins','É',43.63921,5.10006],
+['École maternelle Bastide Haute','É',43.65194,5.10285],['École maternelle François Blanc','É',43.62724,5.09883],['École maternelle Lucie Aubrac','É',43.64363,5.05919],
+['Lycée Silvya Terrade','L',43.64238,5.09344],['Collège Jean Bernard','C',43.6345,5.09348],['Collège la Présentation','C',43.64256,5.09754],['Collège Jean Moulin','C',43.64278,5.10399],
+['École élémentaire Lurian 1','É',43.62643,5.10607],['École maternelle Marceau Ginoux','É',43.63879,5.09176],['École maternelle Pavillon','É',43.64298,5.10754],
+['École maternelle Jean Moulin','É',43.653,5.09759],['École Montessori internationale','É',43.64398,5.08962],['Lycée Adam de Craponne (SEP)','L',43.63488,5.09839],
+['Lycée technologique Le Rocher','L',43.64477,5.09467],['École élémentaire La Crau-Bel Air','É',43.64296,5.05903],['École maternelle Canourgues','É',43.64978,5.09956],
+['École élémentaire Bastide Haute','É',43.65207,5.10225],['École primaire Arnaud Beltrame','É',43.63927,5.08711],['École primaire privée Viala-Lacoste','É',43.64095,5.10116],
+['Collège Joseph d\'Arbaud (SEGPA)','C',43.62401,5.10386],['Lycée Adam de Craponne','L',43.63516,5.09761],['Collège Viala Lacoste','C',43.64094,5.10153],
+['École primaire privée La Présentation','É',43.64339,5.09688],['École élémentaire Saint Norbert','É',43.64963,5.10401],['Lycée Saint-Jean','L',43.64055,5.08215],
+['Collège Joseph d\'Arbaud','C',43.6254,5.1053],['Lycée de l\'Emperi','L',43.63845,5.0977],['Lycée professionnel Le Rocher','L',43.64453,5.09491],
+['École élémentaire du boulevard David','É',43.64422,5.0954],['École élémentaire Marceau Ginoux','É',43.63857,5.09163],['École élémentaire Lurian 2','É',43.62656,5.10529],
+['École maternelle des Alliés','É',43.64633,5.09662],['École maternelle Les Bressons','É',43.64576,5.09094],['École maternelle Capucins','É',43.63885,5.10005],
+['École maternelle Lurian','É',43.62592,5.10675],['École maternelle Jules Michelet','É',43.64125,5.08458],['École élémentaire Canourgues','É',43.64979,5.10055],
+['École maternelle Saint-Norbert','É',43.64942,5.10372],['École maternelle Paul Cézanne','É',43.64575,5.08819],['Lycée Viala Lacoste','L',43.6407,5.1006]
+];
+var JOURS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+
+/* ---------- Générateur pseudo-aléatoire reproductible ---------- */
+function mulberry(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+var rand = mulberry(36);
+function gauss(){var u=1-rand(),v=rand();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+
+/* ---------- Dates ---------- */
+function dateOf(d){var x=new Date(2026,10,12);x.setDate(x.getDate()-(ND-1-d));return x;}
+var WD=[];for(var i=0;i<ND;i++){WD.push((dateOf(i).getDay()+6)%7);}
+function p2(n){return (n<10?'0':'')+n;}
+function fmtDate(d){var x=dateOf(d);return p2(x.getDate())+'/'+p2(x.getMonth()+1)+'/'+x.getFullYear();}
+function fmtDT(t){return fmtDate(Math.floor(t/24))+' '+p2(t%24)+':00';}
+
+/* ---------- Passages ---------- */
+var P=[];
+for(var p=0;p<NP;p++){
+  var sa=SALON[p],type=sa[4];
+  var width=7+Math.round(rand()*15);   /* simulé : à relever sur place */
+  var green=Math.round(width*0.67);    /* simulé : à relever sur place */
+  var need=Math.ceil(width/VITESSE-green);
+  var ext=Math.max(6,Math.min(PLAFOND,need));
+  var b=BASE[type];
+  P.push({
+    i:p,id:'P'+p2(p+1),type:type,sector:sa[2]<5.075?'Ouest':(sa[2]<5.105?'Centre':'Est'),
+    site:sa[0],lat:sa[1],lon:sa[2],nodes:sa[3],near:sa[5],
+    width:width,green:green,need:need,ext:ext,
+    capped:need>PLAFOND,base:b[0]+rand()*(b[1]-b[0])
+  });
+}
+
+/* ---------- Incidents (boîtier hors ligne ou mode dégradé) ---------- */
+var INC=[];
+for(p=0;p<NP;p++){
+  var cur=Math.floor(rand()*600);
+  while(true){
+    var s=cur+50+Math.floor(rand()*1200);
+    if(s>=TOT-48)break;
+    var len=1+Math.floor(rand()*rand()*72);
+    INC.push({p:p,s:s,e:Math.min(s+len,TOT),kind:rand()<0.6?'Perte de communication':'Mode dégradé',ongoing:false});
+    cur=s+len;
+  }
+}
+INC=INC.filter(function(x){return !((x.p===5||x.p===12)&&x.e>TOT-300);});
+INC.push({p:5,s:TOT-31,e:TOT,kind:'Perte de communication',ongoing:true});
+INC.push({p:12,s:TOT-7,e:TOT,kind:'Mode dégradé',ongoing:true});
+var DOWN=new Uint8Array(NP*TOT);
+INC.forEach(function(x){for(var t=x.s;t<x.e;t++){DOWN[x.p*TOT+t]=1;}});
+function stateOf(pi){
+  for(var k=0;k<INC.length;k++){if(INC[k].p===pi&&INC[k].ongoing){return INC[k].kind==='Mode dégradé'?'Mode dégradé':'Hors ligne';}}
+  return 'En service';
+}
+
+/* ---------- Demandes de temps supplémentaire (par passage, jour, heure) ---------- */
+var counts=new Uint16Array(NP*ND*24);
+(function(){
+  for(var q=0;q<NP;q++){
+    var pr=P[q],w=HW[pr.type],sum=0,h,d;
+    for(h=0;h<24;h++)sum+=w[h];
+    for(d=0;d<ND;d++){
+      var trend=0.85+0.3*d/ND;
+      var dn=Math.max(0.6,Math.min(1.4,1+0.15*gauss()));
+      var df=DF[pr.type][WD[d]];
+      for(h=0;h<24;h++){
+        if(DOWN[q*TOT+d*24+h])continue;
+        var lam=pr.base*df*trend*dn*(w[h]/sum);
+        var c=Math.max(0,Math.round(lam+Math.sqrt(lam)*gauss()));
+        counts[(q*ND+d)*24+h]=c;
+      }
+    }
+  }
+})();
+
+/* ---------- Formats ---------- */
+var nf0=new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0});
+var nf1=new Intl.NumberFormat('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1});
+function f0(v){return nf0.format(v);} function f1(v){return nf1.format(v);}
+
+/* Part des usagers cibles qui traversent dans le temps disponible.
+   Hypothèse : vitesses de marche des usagers cibles ~ loi normale (moyenne 0,8 m/s, écart-type 0,2 m/s). À remplacer par les données de la data. */
+var VMU=0.8, VSD=0.2;
+function erf(x){var s=x<0?-1:1;x=Math.abs(x);var t=1/(1+0.3275911*x),y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+function cover(width,green,ext){var tt=green+ext;if(tt<=0)return 0;var vmin=width/tt;return 0.5*(1-erf((vmin-VMU)/(VSD*Math.SQRT2)));}
+
+/* ---------- Agrégations ---------- */
+function stats(idxs,d0,d1){
+  var days=d1-d0,byDay=[],byHour=[],heat=[],occ=[0,0,0,0,0,0,0],i,h;
+  for(i=0;i<days;i++)byDay.push(0);
+  for(h=0;h<24;h++)byHour.push(0);
+  for(i=0;i<7;i++){heat.push(new Array(24).fill(0));}
+  for(i=d0;i<d1;i++)occ[WD[i]]++;
+  var req=0,secs=0,peak=0,peakSecs=0,down=0;
+  idxs.forEach(function(q){
+    for(var d=d0;d<d1;d++){
+      var base=(q*ND+d)*24;
+      for(var hh=0;hh<24;hh++){
+        var c=counts[base+hh];
+        down+=DOWN[q*TOT+d*24+hh];
+        if(!c)continue;
+        req+=c;secs+=c*P[q].ext;byDay[d-d0]+=c;byHour[hh]+=c;heat[WD[d]][hh]+=c;
+        if(PEAK[hh]){peak+=c;peakSecs+=c*P[q].ext;}
+      }
+    }
+  });
+  var avail=idxs.length?100*(1-down/(idxs.length*days*24)):0;
+  return {days:days,req:req,secs:secs,peak:peak,peakSecs:peakSecs,byDay:byDay,byHour:byHour,heat:heat,occ:occ,avail:avail};
+}
+function incidentsIn(idxs,d0,d1){
+  var set={};idxs.forEach(function(q){set[q]=1;});
+  return INC.filter(function(x){return set[x.p]&&x.e>d0*24&&x.s<d1*24;});
+}
+function passageRowsAll(d0,d1){
+  var days=d1-d0,rows=P.map(function(pr){
+    var hh=new Array(24).fill(0),r=0,down=0,pk=0;
+    for(var d=d0;d<d1;d++){for(var h=0;h<24;h++){var c=counts[(pr.i*ND+d)*24+h];hh[h]+=c;r+=c;down+=DOWN[pr.i*TOT+d*24+h];if(PEAK[h])pk+=c;}}
+    var mx=0;for(var k=0;k<24;k++)if(hh[k]>mx)mx=hh[k];
+    return {i:pr.i,id:pr.id,site:pr.site,type:pr.type,sector:pr.sector,width:pr.width,green:pr.green,ext:pr.ext,
+      req:r,perDay:r/days,peakPerDay:pk/days,peakHour:mx/days,secsDay:r/days*pr.ext,avail:100*(1-down/(days*24)),state:stateOf(pr.i),score:0};
+  });
+  var maxPd=Math.max.apply(null,rows.map(function(x){return x.perDay;}))||1;
+  var maxW=Math.max.apply(null,rows.map(function(x){return x.width;}));
+  rows.forEach(function(x){x.score=Math.round(70*x.perDay/maxPd+30*x.width/maxW);});
+  return rows;
+}
+
+/* ---------- État de l'interface ---------- */
+var S={sheet:'synthese',period:30,type:'Tous',pass:'Tous',sel:null,mapLayer:'state',simExt:''};
+var sorts={}, exportData={}, current=null;
+
+function idxs(){return P.filter(function(x){return (S.type==='Tous'||x.type===S.type)&&(S.pass==='Tous'||x.id===S.pass);}).map(function(x){return x.i;});}
+function range(){return [ND-S.period,ND];}
+function prevRange(){var d0=ND-2*S.period;return d0>=0?[d0,ND-S.period]:null;}
+
+/* ---------- Tableaux triables ---------- */
+function tableHTML(id,cols,rows,opts){
+  opts=opts||{};
+  var s=sorts[id]||opts.sort||null,r=rows.slice();
+  if(s){r.sort(function(a,b){var x=a[s.k],y=b[s.k];var c=(typeof x==='number'&&typeof y==='number')?x-y:String(x).localeCompare(String(y),'fr');return s.dir*c;});}
+  exportData[id]={cols:cols,rows:r};
+  var h='<div class="'+(opts.noscroll?'wrap':'scroll')+'"><table class="grid" id="t-'+id+'"><thead><tr>';
+  cols.forEach(function(c){
+    var arrow=(s&&s.k===c.k)?(s.dir>0?' ▲':' ▼'):'';
+    var sortable=opts.nosort?'':' s" tabindex="0" data-t="'+id+'" data-k="'+c.k;
+    h+='<th class="'+(c.n?'n':'')+sortable+'"'+(s&&s.k===c.k?' aria-sort="'+(s.dir>0?'ascending':'descending')+'"':'')+'>'+c.label+arrow+'</th>';
+  });
+  h+='</tr></thead><tbody>';
+  var lim=opts.limit||r.length;
+  r.slice(0,lim).forEach(function(row){
+    h+='<tr'+(opts.rowId?' tabindex="0" data-id="'+row[opts.rowId]+'"'+(S.sel===row[opts.rowId]?' class="sel"':''):'')+'>';
+    cols.forEach(function(c){
+      var v=row[c.k],txt=c.fmt?c.fmt(v,row):v,cls=(c.n?'n':'')+(c.cls?' '+c.cls(v,row):'');
+      h+='<td class="'+cls+'">'+txt+'</td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  if(lim<r.length)h+='<p class="note">'+f0(lim)+' premières lignes affichées sur '+f0(r.length)+'. L\'export CSV contient toutes les lignes.</p>';
+  return h;
+}
+function stCls(v){return v==='En service'?'st-ok':(v==='Mode dégradé'?'st-warn':'st-bad');}
+
+/* ---------- Graphiques SVG ---------- */
+function niceMax(v){if(v<=0)return 1;var e=Math.pow(10,Math.floor(Math.log10(v))),f=v/e;return (f<=1?1:f<=2?2:f<=5?5:10)*e;}
+function barChart(vals,labels,opt){
+  opt=opt||{};
+  var W=800,H=opt.h||220,ml=46,mr=10,mt=10,mb=26,n=vals.length;
+  var mx=niceMax(Math.max.apply(null,vals.concat(opt.line||[0])));
+  var pw=W-ml-mr,ph=H-mt-mb,bw=pw/n,sv='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+(opt.alt||'Graphique')+'">';
+  for(var t=0;t<=4;t++){
+    var y=mt+ph-ph*t/4,v=mx*t/4;
+    sv+='<line x1="'+ml+'" x2="'+(W-mr)+'" y1="'+y+'" y2="'+y+'" stroke="#E1E6EA"/><text x="'+(ml-4)+'" y="'+(y+3)+'" text-anchor="end">'+f0(v)+'</text>';
+  }
+  vals.forEach(function(v,i){
+    var h=ph*v/mx,x=ml+i*bw;
+    sv+='<rect x="'+(x+bw*0.1)+'" y="'+(mt+ph-h)+'" width="'+(bw*0.8)+'" height="'+h+'" fill="var(--accent)"><title>'+labels[i]+' : '+f0(v)+'</title></rect>';
+  });
+  if(opt.line){
+    var pts=opt.line.map(function(v,i){return (ml+i*bw+bw/2).toFixed(1)+','+(mt+ph-ph*v/mx).toFixed(1);}).join(' ');
+    sv+='<polyline points="'+pts+'" fill="none" stroke="#1E2328" stroke-width="2"/>';
+  }
+  var step=Math.max(1,Math.ceil(n/(opt.maxLabels||12)));
+  labels.forEach(function(l,i){if(i%step===0)sv+='<text x="'+(ml+i*bw+bw/2)+'" y="'+(H-10)+'" text-anchor="middle">'+(opt.short?opt.short[i]:l)+'</text>';});
+  sv+='<line x1="'+ml+'" x2="'+(W-mr)+'" y1="'+(mt+ph)+'" y2="'+(mt+ph)+'" stroke="#1E2328"/><line x1="'+ml+'" x2="'+ml+'" y1="'+mt+'" y2="'+(mt+ph)+'" stroke="#1E2328"/></svg>';
+  var lg=opt.line?'<p class="note">Barres : '+(opt.unit||'valeur')+' par '+(opt.per||'jour')+'. Courbe noire : '+opt.lineLabel+'.</p>':'';
+  return '<div class="chart">'+sv+'</div>'+lg;
+}
+function movAvg(a,k){return a.map(function(_,i){var s=0,c=0;for(var j=Math.max(0,i-k+1);j<=i;j++){s+=a[j];c++;}return s/c;});}
+
+/* ---------- Feuilles ---------- */
+function varCell(cur,prev,lowerIsBetter){
+  if(prev===null||prev===undefined||prev===0)return 'n/d';
+  var v=(cur-prev)/prev*100,good=lowerIsBetter?v<0:v>0;
+  return '<span class="'+(Math.abs(v)<0.05?'':(good?'up':'down'))+'">'+(v>0?'+':'')+f1(v)+' %</span>';
+}
+function sheetSynthese(){
+  var ix=idxs(),r=range(),pr=prevRange(),c=stats(ix,r[0],r[1]),p=pr?stats(ix,pr[0],pr[1]):null,days=c.days;
+  var rows=[
+    {k:'Passages équipés (selon filtres)',v:ix.length,p:null,u:'',var:'n/d',raw:ix.length},
+    {k:'Demandes de temps supplémentaire',v:c.req,p:p?p.req:null,u:'',raw:c.req},
+    {k:'Demandes par jour (moyenne)',v:c.req/days,p:p?p.req/days:null,u:'',raw:c.req/days,d:1},
+    {k:'Temps de vert piéton ajouté (heures)',v:c.secs/3600,p:p?p.secs/3600:null,u:'h',raw:c.secs/3600,d:1},
+    {k:'Extension moyenne par demande (s)',v:c.req?c.secs/c.req:0,p:p&&p.req?p.secs/p.req:null,u:'s',raw:c.req?c.secs/c.req:0,d:1},
+    {k:'Demandes en heures de pointe routière (7-9 h, 17-19 h)',v:c.req?100*c.peak/c.req:0,p:p&&p.req?100*p.peak/p.req:null,u:'%',raw:c.req?100*c.peak/c.req:0,d:1,lb:1},
+    {k:'Rouge véhicule ajouté en heures de pointe (s/jour, maximum)',v:c.peakSecs/days,p:p?p.peakSecs/days:null,u:'s',raw:c.peakSecs/days,d:1,lb:1},
+    {k:'Disponibilité moyenne des boîtiers',v:c.avail,p:p?p.avail:null,u:'%',raw:c.avail,d:1}
+  ];
+  var inc=incidentsIn(ix,r[0],r[1]),pinc=pr?incidentsIn(ix,pr[0],pr[1]):null;
+  rows.push({k:'Incidents sur la période',v:inc.length,p:pinc?pinc.length:null,u:'',raw:inc.length,lb:1});
+  var degr=ix.filter(function(q){return stateOf(q)!=='En service';}).length;
+  rows.push({k:'Passages hors service à cet instant',v:degr,p:null,u:'',raw:degr});
+  var kcols=[
+    {k:'k',label:'Indicateur'},
+    {k:'cur',label:'Période',n:1},
+    {k:'prev',label:'Période précédente',n:1},
+    {k:'var',label:'Variation',n:1}
+  ];
+  var krows=rows.map(function(x){
+    var fmt=function(v){return v===null?'n/d':(x.d?f1(v):f0(v))+(x.u?' '+x.u:'');};
+    return {k:x.k,cur:fmt(x.v),prev:fmt(x.p),var:varCell(x.v,x.p,x.lb)};
+  });
+  var kt=tableHTML('kpi',kcols,krows,{noscroll:1,nosort:1});
+  /* export en valeurs brutes */
+  exportData.kpi={cols:[{k:'k',label:'Indicateur'},{k:'cur',label:'Période'},{k:'prev',label:'Période précédente'}],
+    rows:rows.map(function(x){return {k:x.k,cur:x.raw,prev:x.p===null?'':x.p};})};
+  var labels=[],i;for(i=r[0];i<r[1];i++)labels.push(fmtDate(i));
+  var short=labels.map(function(l){return l.slice(0,5);});
+  var all=passageRowsAll(r[0],r[1]).filter(function(x){return ix.indexOf(x.i)>=0;});
+  var top=all.slice().sort(function(a,b){return b.score-a.score;}).slice(0,5);
+  var tcols=[{k:'id',label:'Passage'},{k:'site',label:'Site'},{k:'perDay',label:'Demandes/jour',n:1,fmt:f1},{k:'score',label:'Priorité (0-100)',n:1}];
+  var al=incidentsIn(ix,r[0],r[1]).filter(function(x){return x.ongoing;});
+  var ah=al.length?al.map(function(x){return '<tr><td>'+P[x.p].id+'</td><td>'+P[x.p].site+'</td><td class="'+(x.kind==='Mode dégradé'?'st-warn':'st-bad')+'">'+x.kind+'</td><td>'+fmtDT(x.s)+'</td></tr>';}).join(''):'<tr><td colspan="4">Aucune alerte en cours</td></tr>';
+  var cardIdx=[0,2,3,4,7,8,9],cardCls=['','a','l','a','','l',''],cards='<div class="kpis">'+cardIdx.map(function(q,n){var x=krows[q];return '<div class="kpi '+cardCls[n]+'"><div class="t">'+x.k+'</div><div class="v">'+x.cur+'</div><div class="d">Précédente : '+x.prev+' '+x.var+'</div></div>';}).join('')+'</div>';
+  return cards+'<div class="cols"><div class="block"><h2>Tous les indicateurs</h2>'+kt+
+    '<p class="note">Période : '+fmtDate(r[0])+' au '+fmtDate(r[1]-1)+(pr?'. Comparée aux '+S.period+' jours précédents.':'. Pas de période précédente disponible.')+'</p></div>'+
+    '<div class="block"><h2>Demandes par jour</h2>'+barChart(c.byDay,labels,{short:short,line:movAvg(c.byDay,7),lineLabel:'moyenne sur 7 jours',unit:'demandes',alt:'Demandes par jour'})+'</div></div>'+
+    '<div class="cols"><div class="block"><h2>Passages à traiter en priorité (indice de priorité d\'aménagement)</h2>'+tableHTML('top',tcols,top,{noscroll:1,nosort:1})+
+    '<p class="note">Indice défini dans la feuille Notes. Détail et tri dans la feuille Passages.</p></div>'+
+    '<div class="block"><h2>Alertes en cours</h2><table class="grid"><thead><tr><th>Passage</th><th>Site</th><th>État</th><th>Depuis</th></tr></thead><tbody>'+ah+'</tbody></table></div></div>';
+}
+var PCOLS=[
+  {k:'id',label:'Passage'},{k:'site',label:'Site'},{k:'type',label:'Type'},{k:'sector',label:'Zone'},
+  {k:'width',label:'Largeur (m)',n:1},{k:'green',label:'Vert actuel (s)',n:1},{k:'ext',label:'Extension (s)',n:1},
+  {k:'req',label:'Demandes',n:1,fmt:f0},{k:'perDay',label:'Demandes/jour',n:1,fmt:f1},{k:'peakHour',label:'Pic horaire (dem./h)',n:1,fmt:f1},
+  {k:'secsDay',label:'Secondes ajoutées/jour',n:1,fmt:f0},{k:'avail',label:'Disponibilité (%)',n:1,fmt:f1},
+  {k:'state',label:'État',cls:stCls},{k:'score',label:'Priorité (0-100)',n:1}
+];
+function sheetPassages(){
+  var ix=idxs(),r=range(),rows=passageRowsAll(r[0],r[1]).filter(function(x){return ix.indexOf(x.i)>=0;});
+  var html='<div class="block"><h2>Passages équipés ('+rows.length+')</h2>'+tableHTML('pass',PCOLS,rows,{rowId:'id',sort:{k:'id',dir:1}})+
+    '<p class="note">Cliquer sur une ligne pour le détail. Cliquer sur un en-tête pour trier. Période : '+S.period+' derniers jours.</p></div>';
+  if(S.sel){var pr=P.filter(function(x){return x.id===S.sel;})[0];if(pr&&ix.indexOf(pr.i)>=0)html+=detail(pr,r);}
+  return html;
+}
+function detail(pr,r){
+  var st=stats([pr.i],r[0],r[1]),labels=[],i;
+  for(i=r[0];i<r[1];i++)labels.push(fmtDate(i));
+  var hl=[];for(i=0;i<24;i++)hl.push(p2(i)+' h');
+  var inc=INC.filter(function(x){return x.p===pr.i&&x.e>r[0]*24&&x.s<r[1]*24;});
+  var state=stateOf(pr.i);
+  var dl='<dl class="kv"><dt>Site</dt><dd>'+pr.site+' (zone '+pr.sector+')</dd><dt>Largeur de chaussée (simulée)</dt><dd>'+pr.width+' m</dd><dt>Vert piéton actuel (simulé)</dt><dd>'+pr.green+' s</dd>'+
+    '<dt>Temps de traversée à 0,6 m/s</dt><dd>'+f1(pr.width/VITESSE)+' s</dd><dt>Extension réglée</dt><dd>'+pr.ext+' s'+(pr.capped?' (plafond de '+PLAFOND+' s atteint, besoin calculé : '+pr.need+' s)':'')+'</dd>'+
+    '<dt>État</dt><dd class="'+stCls(state)+'">'+state+'</dd><dt>Type de lieu</dt><dd>'+pr.type+'</dd><dt>Points de signalisation OSM</dt><dd>'+pr.nodes+'</dd><dt>Écoles à moins de 300 m</dt><dd>'+(pr.near.length?pr.near.join(', '):'aucune')+'</dd><dt>Position</dt><dd>'+pr.lat.toFixed(5)+', '+pr.lon.toFixed(5)+'</dd><dt>Incidents sur la période</dt><dd>'+inc.length+'</dd></dl>';
+  var ir=inc.length?inc.map(function(x){return '<tr><td>'+fmtDT(x.s)+'</td><td>'+(x.ongoing?'En cours':fmtDT(x.e))+'</td><td class="n">'+(x.e-x.s)+'</td><td>'+x.kind+'</td></tr>';}).join(''):'<tr><td colspan="4">Aucun incident</td></tr>';
+  return '<fieldset><legend>Détail : '+pr.id+' - '+pr.site+'</legend><div class="cols"><div class="block">'+dl+
+    '<h2 style="margin-top:8px">Incidents</h2><table class="grid"><thead><tr><th>Début</th><th>Fin</th><th class="n">Durée (h)</th><th>Type</th></tr></thead><tbody>'+ir+'</tbody></table></div>'+
+    '<div class="block"><h2>Demandes par jour</h2>'+barChart(st.byDay,labels,{h:160,short:labels.map(function(l){return l.slice(0,5);}),alt:'Demandes par jour du passage'})+
+    '<h2 style="margin-top:8px">Demandes par heure</h2>'+barChart(st.byHour,hl,{h:160,per:'heure',maxLabels:12,alt:'Demandes par heure du passage'})+'</div></div></fieldset>';
+}
+function sheetChrono(){
+  var ix=idxs(),r=range(),c=stats(ix,r[0],r[1]),labels=[],i;
+  for(i=r[0];i<r[1];i++)labels.push(fmtDate(i));
+  var wrows=JOURS.map(function(j,k){
+    var tot=0;for(var h=0;h<24;h++)tot+=c.heat[k][h];
+    var avg=c.occ[k]?tot/c.occ[k]:0;
+    return {day:j,occ:c.occ[k],tot:tot,avg:avg,share:c.req?100*tot/c.req:0};
+  });
+  var wcols=[{k:'day',label:'Jour'},{k:'occ',label:'Jours dans la période',n:1},{k:'tot',label:'Demandes',n:1,fmt:f0},{k:'avg',label:'Moyenne par jour',n:1,fmt:f1},{k:'share',label:'Part (%)',n:1,fmt:f1}];
+  return '<div class="block"><h2>Demandes par jour</h2>'+barChart(c.byDay,labels,{short:labels.map(function(l){return l.slice(0,5);}),line:movAvg(c.byDay,7),lineLabel:'moyenne sur 7 jours',unit:'demandes',alt:'Demandes par jour'})+'</div>'+
+    '<div class="block"><h2>Par jour de la semaine</h2>'+tableHTML('week',wcols,wrows,{noscroll:1,nosort:1})+'</div>';
+}
+function sheetHeures(){
+  var ix=idxs(),r=range(),c=stats(ix,r[0],r[1]),hl=[],h,d;
+  for(h=0;h<24;h++)hl.push(p2(h)+' h');
+  var mx=0;for(d=0;d<7;d++)for(h=0;h<24;h++){var v=c.occ[d]?c.heat[d][h]/c.occ[d]:0;if(v>mx)mx=v;}
+  var t='<table class="grid heat"><thead><tr><th>Jour</th>';
+  for(h=5;h<=22;h++)t+='<th class="n">'+h+'</th>';
+  t+='</tr></thead><tbody>';
+  for(d=0;d<7;d++){
+    t+='<tr><td><b>'+JOURS[d]+'</b></td>';
+    for(h=5;h<=22;h++){
+      var v=c.occ[d]?c.heat[d][h]/c.occ[d]:0,a=mx?v/mx:0;
+      t+='<td class="h" style="background:rgba(var(--heat),'+(a*0.85).toFixed(2)+');color:'+(a>0.5?'#fff':'#000')+'" title="'+JOURS[d]+' '+h+' h : '+f1(v)+' demandes en moyenne">'+(v>=0.5?f0(v):'')+'</td>';
+    }
+    t+='</tr>';
+  }
+  t+='</tbody></table>';
+  exportData.heat={cols:[{k:'day',label:'Jour'}].concat(hl.map(function(x,i){return {k:'h'+i,label:x};})),rows:JOURS.map(function(j,k){var o={day:j};for(var i=0;i<24;i++)o['h'+i]=c.occ[k]?+(c.heat[k][i]/c.occ[k]).toFixed(2):0;return o;})};
+  return '<div class="block"><h2>Demandes par heure de la journée</h2>'+barChart(c.byHour,hl,{per:'heure',maxLabels:24,short:hl.map(function(x,i){return i;}),alt:'Demandes par heure'})+
+    '<p class="note">Part des demandes en heures de pointe routière (7-9 h, 17-19 h) : '+f1(c.req?100*c.peak/c.req:0)+' %.</p></div>'+
+    '<div class="block"><h2>Carte de chaleur : demandes moyennes par jour de la semaine et par heure (filtres appliqués)</h2><div class="scroll">'+t+'</div><p class="note">Plus la case est foncée, plus la demande est forte. Survol : valeur exacte.</p></div>';
+}
+function sheetAlertes(){
+  var ix=idxs(),r=range(),rows=incidentsIn(ix,r[0],r[1]).map(function(x){
+    return {s:x.s,start:fmtDT(x.s),end:x.ongoing?'En cours':fmtDT(x.e),h:x.e-x.s,id:P[x.p].id,site:P[x.p].site,kind:x.kind,status:x.ongoing?'En cours':'Résolu'};
+  });
+  var cols=[{k:'start',label:'Début'},{k:'end',label:'Fin'},{k:'h',label:'Durée (h)',n:1},{k:'id',label:'Passage'},{k:'site',label:'Site'},{k:'kind',label:'Type'},{k:'status',label:'Statut',cls:function(v){return v==='En cours'?'st-bad':'';}}];
+  return '<div class="block"><h2>Incidents ('+rows.length+')</h2>'+tableHTML('alert',cols,rows.sort(function(a,b){return b.s-a.s;}),{})+
+    '<p class="note">Mode dégradé ou hors ligne : le feu fonctionne comme avant avec le bouton piéton, seul le temps supplémentaire est indisponible. Le tri par date repose sur le début de l\'incident.</p></div>';
+}
+function sheetDonnees(){
+  var ix=idxs(),r=range(),rows=[];
+  ix.forEach(function(q){
+    for(var d=r[0];d<r[1];d++){
+      var c=0,dn=0;for(var h=0;h<24;h++){c+=counts[(q*ND+d)*24+h];dn+=DOWN[q*TOT+d*24+h];}
+      rows.push({ts:d,date:fmtDate(d),id:P[q].id,site:P[q].site,type:P[q].type,req:c,secs:c*P[q].ext,avail:100*(1-dn/24)});
+    }
+  });
+  var cols=[{k:'date',label:'Date'},{k:'id',label:'Passage'},{k:'site',label:'Site'},{k:'type',label:'Type'},{k:'req',label:'Demandes',n:1,fmt:f0},{k:'secs',label:'Secondes ajoutées',n:1,fmt:f0},{k:'avail',label:'Disponibilité (%)',n:1,fmt:f1}];
+  if(!sorts.data)sorts.data={k:'ts',dir:-1};
+  return '<div class="block"><h2>Données journalières ('+f0(rows.length)+' lignes)</h2>'+tableHTML('data',cols.map(function(c){return c.k==='date'?{k:'ts',label:'Date',fmt:function(v){return fmtDate(v);}}:c;}),rows,{limit:400})+'</div>';
+}
+function sheetNotes(){
+  return '<div class="block" style="max-width:860px"><h2>Notes : méthode, hypothèses, limites</h2><div style="border:1px solid var(--line);padding:8px 12px;background:#fff">'+
+  '<p><b>Ce qui est réel, ce qui est simulé.</b> Réel : les carrefours à feux (OpenStreetMap, 12/11/2026, regroupés par l\'équipe : 18 carrefours, 41 points de signalisation), leurs rues et positions, les 43 établissements scolaires de la commune (annuaire de l\'Éducation nationale). Simulé : les demandes de temps supplémentaire, les largeurs de chaussée, les durées de vert, les incidents et l\'état des boîtiers. Aucun capteur, aucun boîtier, aucune convention avec la ville : le dashboard illustre ce que verrait la collectivité si Laps équipait tous les carrefours à feux de la commune. Le résultat est reproductible (graine fixe).</p>'+
+  '<p><b>Types de lieu.</b> Hôpital et EHPAD : carrefours de l\'avenue Julien Fabre (hôpital, EHPAD, USLD au n° 207) et de l\'avenue Roger Donnadieu (EHPAD Enclos Saint Léon). Centre-ville et marché : carrefours du centre (marchés du mercredi, samedi et dimanche, à vérifier). Abords d\'école : au moins un établissement à moins de 300 m. Autre axe : les autres carrefours. Zone Ouest, Centre, Est : selon la longitude (limites 5,075 et 5,105), repère de présentation sans valeur administrative. Les établissements pour personnes âgées ne sont pas placés sur la carte : seules leurs adresses sont connues (voir le rapport sur Salon).</p>'+
+  '<p><b>Extension de temps.</b> Règle utilisée : (largeur de chaussée / 0,6 m/s) - vert actuel, bornée de 6 à '+PLAFOND+' s. Le 0,6 m/s est la valeur du doc d\'équipe pour une personne âgée ou à mobilité réduite ; le plafond de '+PLAFOND+' s et la borne basse sont des hypothèses. Le vert actuel est simulé à 0,67 s par mètre (cohérent avec l\'exemple du doc : 12 m, environ 8 s).</p>'+
+  '<p><b>Demandes.</b> Volume de base par passage tiré au hasard dans une plage par type de site, profil horaire et profil par jour de semaine propres à chaque type, croissance de 30 % sur 180 jours, bruit aléatoire. Ces paramètres sont des hypothèses à remplacer par des valeurs issues de la data.</p>'+
+  '<p><b>Heures de pointe routière.</b> 7-9 h et 17-19 h (hypothèse). Cet indicateur répond à la crainte des gestionnaires de voirie : allonger le feu piéton gêne la circulation.</p>'+
+  '<p><b>Secondes ajoutées.</b> Nombre de demandes multiplié par l\'extension réglée du passage. C\'est un maximum : le feu peut se terminer plus tôt si la personne a fini de traverser (non simulé).</p>'+
+  '<p><b>Disponibilité.</b> 100 % moins la part des heures en incident (hors ligne ou mode dégradé), sur la période et les passages filtrés.</p>'+
+  '<p><b>Indice de priorité d\'aménagement.</b> 70 % : demandes par jour du passage rapportées au maximum des 18 passages ; 30 % : largeur de chaussée rapportée à la plus grande. Pondérations arbitraires, à discuter. Il sert à repérer où investir (bancs, abaissement de trottoir, îlot refuge), pas à classer officiellement.</p>'+
+  '<p><b>Carte.</b> Projection des coordonnées réelles, sans fond de carte (la page fonctionne hors ligne). Les 18 carrefours sont un minimum : OpenStreetMap peut être incomplet. Largeur de chaussée et durée de vert sont simulées en attendant un relevé.</p>'+
+  '<p><b>Couverture (feuille Réglages).</b> Part des usagers cibles dont le temps de traversée tient dans (vert + extension). Hypothèse : vitesses de marche en loi normale, moyenne 0,8 m/s (étude de presse citée dans le doc d\'équipe, 0,8 à 0,9 m/s pour les plus de 65 ans), écart-type 0,2 m/s (arbitraire). Avec ces valeurs, une extension calculée à 0,6 m/s couvre environ 84 % des usagers cibles ; le plafond de '+PLAFOND+' s et la borne basse font baisser la moyenne des passages larges (environ 77 % dans cette simulation). Sans Laps, la couverture tombe à près de 0 % sur ces chaussées : c\'est une conséquence des hypothèses, pas une mesure. À remplacer par une distribution mesurée ou sourcée.</p>'+
+  '<p><b>Rouge véhicule en pointe.</b> Demandes des heures de pointe multipliées par l\'extension : borne haute de l\'impact sur la circulation, sans modèle de carrefour ni coordination avec les feux voisins.</p>'+
+  '<p><b>Vie privée.</b> Le dashboard ne contient aucune donnée nominative ni identifiant de carte. Seuls des comptages agrégés par passage, jour et heure sont affichés (principe du doc d\'équipe : jeton anonyme, aucun historique individuel).</p>'+
+  '<p><b>Limites.</b> Pas de comptes utilisateurs ni de sauvegarde. Les chiffres ne prouvent rien sur l\'efficacité réelle ou la sécurité. Le nombre de boîtiers par carrefour (un passage = un carrefour) est à préciser : un carrefour compte plusieurs traversées.</p>'+
+  '</div></div>';
+}
+/* Carte : projection simple des coordonnées réelles (pas de fond de carte, hors ligne). */
+var MAP={lon0:5.055,lon1:5.12,lat0:43.622,lat1:43.655,w:780,pad:20};
+MAP.k=(MAP.w-2*MAP.pad)/(MAP.lon1-MAP.lon0);          /* pixels par degré de longitude */
+MAP.ky=MAP.k/Math.cos(43.64*Math.PI/180);            /* pixels par degré de latitude */
+MAP.h=Math.round((MAP.lat1-MAP.lat0)*MAP.ky+2*MAP.pad);
+function mx(lon){return MAP.pad+(lon-MAP.lon0)*MAP.k;}
+function my(lat){return MAP.pad+(MAP.lat1-lat)*MAP.ky;}
+function scale(v,max){return max?Math.max(0,Math.min(1,v/max)):0;}
+function sheetCarte(){
+  var ix=idxs(),r=range(),all=passageRowsAll(r[0],r[1]),maxPd=0,maxSc=0;
+  all.forEach(function(x){if(x.perDay>maxPd)maxPd=x.perDay;if(x.score>maxSc)maxSc=x.score;});
+  var sv='<svg viewBox="0 0 '+MAP.w+' '+MAP.h+'" role="img" aria-label="Carte des carrefours à feux de Salon-de-Provence">';
+  sv+='<rect x="1" y="1" width="'+(MAP.w-2)+'" height="'+(MAP.h-2)+'" fill="#F7F9FA" stroke="#C9D0D6"/>';
+  ECOLES.forEach(function(e){
+    if(e[2]<MAP.lat0||e[2]>MAP.lat1||e[3]<MAP.lon0||e[3]>MAP.lon1)return;
+    sv+='<rect x="'+(mx(e[3])-3).toFixed(1)+'" y="'+(my(e[2])-3).toFixed(1)+'" width="6" height="6" fill="#8F9AA3"><title>'+e[0]+'</title></rect>';
+  });
+  var m500=500*0.1413;
+  sv+='<line x1="'+(MAP.w-MAP.pad-m500)+'" x2="'+(MAP.w-MAP.pad)+'" y1="'+(MAP.h-14)+'" y2="'+(MAP.h-14)+'" stroke="#000" stroke-width="2"/><text x="'+(MAP.w-MAP.pad-m500)+'" y="'+(MAP.h-18)+'">500 m</text>';
+  sv+='<text x="'+MAP.pad+'" y="'+(MAP.h-8)+'">Nord en haut. Positions réelles (OpenStreetMap), sans fond de carte.</text>';
+  all.forEach(function(x){
+    var pr=P[x.i],on=ix.indexOf(x.i)>=0,cx=mx(pr.lon),cy=my(pr.lat),rad=5+9*scale(x.perDay,maxPd),fill;
+    if(S.mapLayer==='state')fill=x.state==='En service'?'#1B7A43':(x.state==='Mode dégradé'?'#C98A00':'#B3261E');
+    else if(S.mapLayer==='score')fill='rgba(var(--heat),'+(0.15+0.85*scale(x.score,maxSc)).toFixed(2)+')';
+    else fill='rgba(var(--heat),'+(0.15+0.85*scale(x.perDay,maxPd)).toFixed(2)+')';
+    sv+='<circle data-pid="'+x.id+'" tabindex="0" cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+rad.toFixed(1)+'" fill="'+fill+'" stroke="'+(S.sel===x.id?'#1E2328':'#fff')+'" stroke-width="'+(S.sel===x.id?3:1.5)+'" opacity="'+(on?1:0.18)+'" style="cursor:pointer"><title>'+x.id+' - '+x.site+' : '+f1(x.perDay)+' demandes/jour, '+x.state+'</title></circle>';
+    if(on)sv+='<text x="'+(cx+rad+2).toFixed(1)+'" y="'+(cy-rad-1).toFixed(1)+'" pointer-events="none">'+x.id+'</text>';
+  });
+  sv+='</svg>';
+  var sel=all.filter(function(x){return x.id===S.sel;})[0],panel;
+  if(sel){
+    var pr=P[sel.i];
+    panel='<dl class="kv"><dt>Passage</dt><dd>'+sel.id+' - '+sel.site+'</dd><dt>Zone</dt><dd>'+sel.sector+'</dd><dt>Type de lieu</dt><dd>'+pr.type+'</dd><dt>État</dt><dd class="'+stCls(sel.state)+'">'+sel.state+'</dd>'+
+      '<dt>Demandes par jour</dt><dd>'+f1(sel.perDay)+'</dd><dt>Disponibilité</dt><dd>'+f1(sel.avail)+' %</dd><dt>Largeur / vert / extension</dt><dd>'+pr.width+' m / '+pr.green+' s / '+pr.ext+' s</dd>'+
+      '<dt>Priorité</dt><dd>'+sel.score+' sur 100</dd></dl><p><button type="button" id="goDetail">Voir le détail</button></p>';
+  } else panel='<p>Cliquer sur un passage de la carte pour voir ses indicateurs.</p>';
+  var leg=S.mapLayer==='state'?'Couleur : vert en service, orange mode dégradé, rouge hors ligne.':'Couleur : plus le point est foncé, plus la valeur est forte.';
+  return '<div class="cols"><div class="block" style="flex:2 1 520px"><h2>Carte des carrefours à feux de Salon-de-Provence</h2>'+
+    '<div style="border:1px solid var(--line);padding:4px;background:#fff"><p style="margin:0 0 4px"><label for="mapLayer">Colorier selon :</label> <select id="mapLayer">'+
+    '<option value="state"'+(S.mapLayer==='state'?' selected':'')+'>État du boîtier</option><option value="vol"'+(S.mapLayer==='vol'?' selected':'')+'>Volume de demandes</option><option value="score"'+(S.mapLayer==='score'?' selected':'')+'>Indice de priorité</option></select></p>'+
+    '<div class="chart" style="border:0;padding:0">'+sv+'</div></div>'+
+    '<p class="note">Taille du point : demandes par jour. '+leg+' Passages hors filtres : estompés. Carrés gris : établissements scolaires (position réelle). Les établissements pour personnes âgées ne sont pas placés : leurs coordonnées manquent.</p></div>'+
+    '<div class="block" style="flex:1 1 260px"><h2>Passage sélectionné</h2><div style="border:1px solid var(--line);padding:6px 8px;background:#fff">'+panel+'</div></div></div>';
+}
+function simData(){
+  var ix=idxs(),r=range(),e=(S.simExt===''||isNaN(+S.simExt))?null:Math.max(0,Math.min(40,+S.simExt));
+  var rows=passageRowsAll(r[0],r[1]).filter(function(x){return ix.indexOf(x.i)>=0;}).map(function(x){
+    var pr=P[x.i],es=e===null?x.ext:e;
+    return {id:x.id,site:x.site,width:x.width,green:x.green,ext:x.ext,extS:es,
+      c0:100*cover(x.width,x.green,0),c1:100*cover(x.width,x.green,x.ext),c2:100*cover(x.width,x.green,es),
+      s1:x.secsDay,s2:x.perDay*es,p1:x.peakPerDay*x.ext,p2:x.peakPerDay*es,pd:x.perDay};
+  });
+  return {rows:rows,e:e};
+}
+function simOut(){
+  var d=simData(),rows=d.rows,t={s1:0,s2:0,p1:0,p2:0,w:0,c0:0,c1:0,c2:0};
+  rows.forEach(function(x){t.s1+=x.s1;t.s2+=x.s2;t.p1+=x.p1;t.p2+=x.p2;t.w+=x.pd;t.c0+=x.c0*x.pd;t.c1+=x.c1*x.pd;t.c2+=x.c2*x.pd;});
+  var w=t.w||1;
+  var sum=[
+    {k:'Usagers cibles qui traversent dans le temps imparti (moyenne pondérée par les demandes)',a:f1(t.c0/w)+' %',b:f1(t.c1/w)+' %',c:f1(t.c2/w)+' %'},
+    {k:'Secondes de vert piéton ajoutées par jour (maximum)',a:'0',b:f0(t.s1),c:f0(t.s2)},
+    {k:'Rouge véhicule ajouté en heures de pointe, par jour (maximum, secondes)',a:'0',b:f0(t.p1),c:f0(t.p2)}
+  ];
+  var scols=[{k:'k',label:'Indicateur'},{k:'a',label:'Sans Laps',n:1},{k:'b',label:'Réglage actuel',n:1},{k:'c',label:'Réglage simulé',n:1}];
+  var cols=[{k:'id',label:'Passage'},{k:'site',label:'Site'},{k:'width',label:'Largeur (m)',n:1},{k:'green',label:'Vert (s)',n:1},{k:'ext',label:'Ext. actuelle (s)',n:1},{k:'extS',label:'Ext. simulée (s)',n:1},
+    {k:'c0',label:'Couverture sans Laps (%)',n:1,fmt:f1},{k:'c1',label:'Couverture actuelle (%)',n:1,fmt:f1},{k:'c2',label:'Couverture simulée (%)',n:1,fmt:f1},
+    {k:'s1',label:'Sec. ajoutées/jour actuel',n:1,fmt:f0},{k:'s2',label:'Sec. ajoutées/jour simulé',n:1,fmt:f0},{k:'p1',label:'Rouge pointe/jour actuel (s)',n:1,fmt:f0},{k:'p2',label:'Rouge pointe/jour simulé (s)',n:1,fmt:f0}];
+  var warn=(d.e!==null&&d.e>PLAFOND)?'<p class="st-warn">Au-dessus du plafond de '+PLAFOND+' s retenu dans la simulation (hypothèse).</p>':'';
+  return warn+'<h2>Résultat (passages filtrés : '+rows.length+')</h2>'+tableHTML('simsum',scols,sum,{noscroll:1,nosort:1})+
+    '<h2 style="margin-top:10px">Détail par passage</h2>'+tableHTML('sim',cols,rows,{sort:{k:'id',dir:1}});
+}
+function sheetReglages(){
+  return '<div class="block"><h2>Réglage de l\'extension : simulation</h2><div style="border:1px solid var(--line);padding:6px 8px;background:#fff">'+
+    '<label for="simExt">Extension à appliquer à tous les passages filtrés (secondes) :</label> <input id="simExt" type="number" min="0" max="40" step="1" style="width:60px" value="'+S.simExt+'" placeholder="actuel"> '+
+    '<button type="button" id="simReset">Revenir au réglage actuel</button>'+
+    '<p class="note">Laisser vide pour le réglage actuel de chaque passage. Cette feuille simule seulement : elle ne modifie aucun boîtier.</p></div></div>'+
+    '<div id="simOut" class="block">'+simOut()+'</div>'+
+    '<p class="note">La couverture est la part des usagers cibles dont le temps de traversée tient dans (vert + extension). Elle repose sur une distribution de vitesses hypothétique (feuille Notes). Les secondes ajoutées sont un maximum : le feu peut se terminer plus tôt.</p>';
+}
+function sheetRapport(){
+  var r=range();
+  var head='<div class="block"><h2>Rapport de période</h2><div style="border:1px solid var(--line);padding:8px 12px;background:#fff;line-height:2">'+
+    'Collectivité : Ville de Salon-de-Provence &nbsp; Responsable : ______________________________<br>'+
+    'Établi le : ____/____/________ &nbsp; Période : '+fmtDate(r[0])+' au '+fmtDate(r[1]-1)+' &nbsp; Filtres : '+S.type+' / '+S.pass+'<br>'+
+    '<b>DONNÉES SIMULÉES, à ne pas diffuser comme des résultats réels.</b></div></div>';
+  var foot='<div class="block"><h2>Hypothèses principales</h2><div style="border:1px solid var(--line);padding:6px 12px;background:#fff">'+
+    '<p>Pilote hypothétique : tous les carrefours à feux repérés dans OpenStreetMap, soit 18 passages. Extension calculée à 0,6 m/s et bornée à '+PLAFOND+' s. Heures de pointe routière : 7-9 h et 17-19 h. Aucune donnée nominative. Détail complet : feuille Notes.</p></div></div>';
+  return head+sheetSynthese()+foot;
+}
+var SHEETS=[
+  {id:'synthese',label:'Synthèse',fn:sheetSynthese,exp:'kpi'},
+  {id:'carte',label:'Carte',fn:sheetCarte,exp:null},
+  {id:'passages',label:'Passages',fn:sheetPassages,exp:'pass'},
+  {id:'reglages',label:'Réglages',fn:sheetReglages,exp:'sim'},
+  {id:'chrono',label:'Chronologie',fn:sheetChrono,exp:'week'},
+  {id:'heures',label:'Heures',fn:sheetHeures,exp:'heat'},
+  {id:'alertes',label:'Alertes',fn:sheetAlertes,exp:'alert'},
+  {id:'donnees',label:'Données',fn:sheetDonnees,exp:'data'},
+  {id:'rapport',label:'Rapport',fn:sheetRapport,exp:'kpi'},
+  {id:'notes',label:'Notes',fn:sheetNotes,exp:null}
+];
+
+/* ---------- Rendu ---------- */
+var $=function(id){return document.getElementById(id);};
+function render(){
+  var sh=SHEETS.filter(function(x){return x.id===S.sheet;})[0]||SHEETS[0];
+  $('content').innerHTML=sh.fn();
+  current=sh;
+  var tabs='';
+  SHEETS.forEach(function(x){tabs+='<button type="button" role="tab" data-sheet="'+x.id+'" aria-selected="'+(x.id===S.sheet)+'">'+x.label+'</button>';});
+  $('tabs').innerHTML=tabs;
+  var r=range();
+  $('sCount').textContent=idxs().length+' passage(s) sélectionné(s) sur '+NP;
+  $('sPeriod').textContent='Période : '+fmtDate(r[0])+' au '+fmtDate(r[1]-1);
+  $('bCsv').disabled=!sh.exp;
+  $('stamp').textContent='Données simulées au '+fmtDate(ND-1);
+}
+function fillPass(){
+  var cur=S.pass,o='<option>Tous</option>';
+  P.filter(function(x){return S.type==='Tous'||x.type===S.type;}).forEach(function(x){o+='<option value="'+x.id+'">'+x.id+' - '+x.site+'</option>';});
+  $('fPass').innerHTML=o;
+  if(!P.some(function(x){return x.id===cur&&(S.type==='Tous'||x.type===S.type);}))S.pass='Tous';
+  $('fPass').value=S.pass;
+}
+function csv(cols,rows){
+  function q(v){v=(v===null||v===undefined)?'':String(v);return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+  var out=[cols.map(function(c){return q(c.label);}).join(';')];
+  rows.forEach(function(r){out.push(cols.map(function(c){var v=r[c.k];return q(typeof v==='number'?String(Math.round(v*100)/100).replace('.',','):v);}).join(';'));});
+  return '﻿'+out.join('\r\n');
+}
+function download(){
+  if(!current||!current.exp||!exportData[current.exp])return;
+  var d=exportData[current.exp],blob=new Blob([csv(d.cols,d.rows)],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='laps-simule-'+current.id+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+}
+
+/* ---------- Événements ---------- */
+var tsel='<option>Tous</option>'+TYPES.map(function(t){return '<option>'+t+'</option>';}).join('');
+$('fType').innerHTML=tsel;
+fillPass();
+$('fPeriod').addEventListener('change',function(){S.period=+this.value;render();});
+$('fType').addEventListener('change',function(){S.type=this.value;fillPass();render();});
+$('fPass').addEventListener('change',function(){S.pass=this.value;render();});
+$('bPrint').addEventListener('click',function(){window.print();});
+$('bCsv').addEventListener('click',download);
+$('tabs').addEventListener('click',function(e){var b=e.target.closest('button[data-sheet]');if(b){S.sheet=b.getAttribute('data-sheet');location.hash=S.sheet;render();}});
+function sortClick(th){
+  var id=th.getAttribute('data-t'),k=th.getAttribute('data-k'),s=sorts[id];
+  sorts[id]=(s&&s.k===k)?{k:k,dir:-s.dir}:{k:k,dir:1};
+  var y=$('content').scrollTop;render();$('content').scrollTop=y;
+}
+$('content').addEventListener('click',function(e){
+  var th=e.target.closest('th[data-t]');if(th){sortClick(th);return;}
+  var tr=e.target.closest('tr[data-id]');if(tr){S.sel=tr.getAttribute('data-id');render();var f=$('content').querySelector('fieldset');if(f)f.scrollIntoView({block:'nearest'});}
+});
+$('content').addEventListener('keydown',function(e){
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  var th=e.target.closest('th[data-t]');if(th){e.preventDefault();sortClick(th);return;}
+  var tr=e.target.closest('tr[data-id]');if(tr){e.preventDefault();S.sel=tr.getAttribute('data-id');render();}
+});
+function pickPass(id){S.sel=id;render();}
+$('content').addEventListener('click',function(e){
+  var c=e.target.closest('[data-pid]');if(c){pickPass(c.getAttribute('data-pid'));return;}
+  if(e.target.id==='goDetail'){S.sheet='passages';location.hash='passages';render();return;}
+  if(e.target.id==='simReset'){S.simExt='';render();}
+});
+$('content').addEventListener('keydown',function(e){
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  var c=e.target.closest('[data-pid]');if(c){e.preventDefault();pickPass(c.getAttribute('data-pid'));}
+});
+$('content').addEventListener('change',function(e){if(e.target.id==='mapLayer'){S.mapLayer=e.target.value;render();}});
+$('content').addEventListener('input',function(e){if(e.target.id==='simExt'){S.simExt=e.target.value;$('simOut').innerHTML=simOut();}});
+var h0=location.hash.replace('#','');
+if(SHEETS.some(function(x){return x.id===h0;}))S.sheet=h0;
+render();
+})();
+</script>
+</body>
+</html>

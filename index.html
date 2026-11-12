@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LAPS : plus de temps pour traverser</title>
+<meta name="description" content="Laps prolonge le vert piéton à la demande, pour les personnes qui marchent plus lentement.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{--ink:#1E2328;--ink2:#2a3138;--cyan:#0A7686;--cyan2:#6FD3E3;--bg:#EEF1F3;--lime:#8FBF1F;--mute:#5C6670;--line:#C9D0D6;--red:#D6352B;--font:'DM Sans',Arial,sans-serif;--mono:'DM Mono',Consolas,monospace}
+*{box-sizing:border-box;border-radius:0}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;font:19px/1.5 var(--font);color:var(--ink);background:#fff;overflow-x:hidden}
+img,svg{max-width:100%}
+a{color:var(--cyan)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+#prog{position:fixed;top:0;left:0;height:4px;width:0;background:var(--lime);z-index:20}
+header.top{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.btn{display:inline-block;background:var(--cyan);color:#fff;text-decoration:none;font-weight:700;padding:15px 28px;border:2px solid var(--cyan);font-size:18px;cursor:pointer;font-family:var(--font)}
+.btn:hover{background:#085c69;border-color:#085c69}
+.btn.alt{background:transparent;color:var(--ink);border-color:var(--ink)}.btn.alt:hover{background:var(--ink);color:#fff}
+.btn.sm{padding:9px 18px;font-size:15px}
+.btn:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+#dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:9;display:flex;flex-direction:column;gap:12px}
+#dots a{width:14px;height:14px;border:2px solid var(--ink);background:#fff;display:block;position:relative}
+#dots a.on{background:var(--lime);border-color:var(--ink);transform:scale(1.25)}
+#dots a span{position:absolute;right:24px;top:-4px;background:var(--ink);color:#fff;font:500 12px var(--mono);padding:3px 8px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
+#dots a:hover span,#dots a:focus-visible span{opacity:1}
+section{padding:96px 0;min-height:78vh;display:flex;align-items:center}
+section>.wrap{width:100%}
+.tag{font:500 13px var(--mono);letter-spacing:1px;color:var(--cyan);margin:0 0 12px}
+.tag b{background:var(--ink);color:#fff;padding:3px 8px;margin-right:8px}
+h1,h2{margin:0;line-height:1.05;font-weight:700}
+h2{font-size:clamp(32px,5vw,56px);max-width:820px}
+.lead{font-size:clamp(20px,2.2vw,24px);color:var(--mute);margin:16px 0 0;max-width:620px}
+.dark{background:var(--ink);color:#fff}.dark .lead{color:#c8d0d6}.dark .tag{color:var(--cyan2)}.dark .tag b{background:var(--lime);color:var(--ink)}
+.alt{background:var(--bg)}
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.12s}.rv.d2{transition-delay:.24s}.rv.d3{transition-delay:.36s}
+/* hero */
+.hero{min-height:calc(100vh - 64px);padding:56px 0}
+.hero .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(40px,6vw,76px);color:#fff}
+.hero h1 em{font-style:normal;color:var(--lime)}
+.hero .lead{color:#d5dce1}
+.hero .cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:32px}
+.hero .btn.alt{color:#fff;border-color:#fff}.hero .btn.alt:hover{background:#fff;color:var(--ink)}
+.lane{position:relative;height:150px;background:var(--ink2);border-top:6px solid #fff;border-bottom:6px solid #fff;overflow:hidden}
+.zebra{position:absolute;left:30%;top:0;bottom:0;width:40%;display:flex;gap:8px}.zebra i{flex:1;background:#fff}
+.walker{position:absolute;top:50%;width:26px;height:44px;margin-top:-22px;left:3%}
+.hero .walker{animation:walk 9s linear infinite}
+@keyframes walk{0%,8%{left:3%}70%{left:50%}100%{left:93%}}
+.bar{display:flex;margin-top:14px;font:500 13px var(--mono);color:#fff}.bar span{padding:10px 8px;white-space:nowrap}
+.b1{background:var(--cyan);width:70%}.b2{background:var(--lime);color:var(--ink);width:30%;animation:grow 9s ease-out infinite}
+@keyframes grow{0%,20%{width:0;padding:10px 0;opacity:0}35%,100%{width:30%;opacity:1}}
+.scroll{display:inline-block;margin-top:40px;color:#9aa6af;font:500 13px var(--mono);text-decoration:none}
+/* jeu */
+.game{background:#fff;border:2px solid var(--ink);padding:20px;margin-top:30px}
+.ctrl{display:flex;flex-wrap:wrap;gap:14px 26px;align-items:center;margin-bottom:16px}
+.seg{display:flex}.seg button{font:500 16px var(--font);padding:11px 18px;border:2px solid var(--ink);background:#fff;color:var(--ink);margin-right:-2px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.sw{display:flex;align-items:center;gap:10px;font-weight:700;cursor:pointer;user-select:none}
+.sw input{position:absolute;opacity:0}
+.sw i{width:56px;height:30px;background:#aab3ba;position:relative;transition:background .2s}
+.sw i:after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;background:#fff;transition:left .2s}
+.sw input:checked+i{background:var(--lime)}.sw input:checked+i:after{left:29px}
+.sw input:focus-visible+i{outline:3px solid var(--cyan);outline-offset:2px}
+#stage{--H:clamp(270px,36vw,380px);position:relative;height:var(--H);background:#3a4650;overflow:hidden;border:2px solid var(--ink)}
+#stage.shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:none}20%{transform:translate(-8px,3px)}40%{transform:translate(7px,-4px)}60%{transform:translate(-5px,2px)}80%{transform:translate(3px,-1px)}}
+.sidew{position:absolute;top:0;bottom:0;width:20%;background:#8d99a3}
+.sidew.l{left:0}.sidew.r{right:0}
+.gameroad{position:absolute;left:20%;width:60%;top:0;bottom:0;background:#2a3138}
+.gameroad:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:0;border-left:4px dashed #6b7782}
+.zb{position:absolute;left:20%;width:60%;top:40%;height:52%;display:flex;gap:2.2%;padding:0 1%}
+.zb i{flex:1;background:#e8ecef;opacity:.9}
+.plight{position:absolute;right:3%;top:8%;background:var(--ink);border:2px solid #fff;padding:6px;display:flex;flex-direction:column;gap:6px;z-index:5}
+.plight i{width:26px;height:26px;background:#444;display:block}.plight i.r.on{background:var(--red)}.plight i.g.on{background:#2FBF71}
+.plight small{font:500 10px var(--mono);color:#fff;text-align:center}
+.who{position:absolute;bottom:0;transform:translateX(-50%);transform-origin:50% 100%;transition:transform .6s cubic-bezier(.2,.7,.3,1)}
+.who svg{display:block;height:100%;width:auto;overflow:visible}
+.who.fall{transform:translateX(-30%) translateY(-14%) rotate(-96deg)}
+.l1,.l2,.a1,.a2{transform-box:view-box}
+.l1,.l2{transform-origin:20px 56px}.a1,.a2{transform-origin:20px 28px}
+.walking .l1{animation:sw var(--dur,.7s) ease-in-out infinite alternate}
+.walking .l2{animation:sw var(--dur,.7s) ease-in-out infinite alternate-reverse}
+.walking .a1{animation:sw var(--dur,.7s) ease-in-out infinite alternate-reverse}
+.walking .a2{animation:sw var(--dur,.7s) ease-in-out infinite alternate}
+@keyframes sw{from{transform:rotate(calc(var(--ang,26deg)*-1))}to{transform:rotate(var(--ang,26deg))}}
+.armup{transform-origin:20px 28px;transition:transform .35s}
+.stop .armup{transform:rotate(180deg)}
+.sign{opacity:0;transition:opacity .2s}.stop .sign{opacity:1}
+.car{position:absolute;z-index:3;transform:translateX(-50%)}
+.car svg{display:block;width:100%;height:100%}
+#fx{position:absolute;z-index:6;width:90px;height:90px;transform:translate(-50%,-50%) scale(0);pointer-events:none}
+#fx.on{animation:pop .5s forwards}
+@keyframes pop{0%{transform:translate(-50%,-50%) scale(0)}60%{transform:translate(-50%,-50%) scale(1.5)}100%{transform:translate(-50%,-50%) scale(1.2);opacity:1}}
+#flash{position:absolute;inset:0;background:var(--red);opacity:0;z-index:7;pointer-events:none;transition:opacity .15s}
+#flash.on{opacity:.45}
+.hud{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:14px;font:500 15px var(--mono)}
+.gbar{height:18px;background:#dfe5e9;position:relative;flex:1;min-width:200px}
+.gbar b{position:absolute;left:0;top:0;bottom:0;background:var(--cyan);width:0}.gbar u{position:absolute;top:0;bottom:0;background:var(--lime);width:0;text-decoration:none}
+.res{min-height:70px;margin-top:12px;font-size:22px;font-weight:700;padding:12px 16px;border-left:8px solid var(--line);background:var(--bg)}
+.res small{display:block;font-size:15px;font-weight:400;color:var(--mute);margin-top:3px}
+.res.bad{border-color:var(--red);background:#fbeceb}.res.warn{border-color:#F2A21E;background:#fdf3e1}.res.ok{border-color:var(--lime);background:#f1f7df}
+.btn[hidden]{display:none}
+.cta-final .road span{color:#e3f3f6}.cta-final .road b{color:#fff}.cta-final .road div{border-top-color:rgba(255,255,255,.55)}.cta-final .road div:nth-child(3){border-top-color:var(--lime)}
+.badge{display:inline-block;background:var(--ink);color:#fff;font:500 13px var(--mono);padding:3px 8px;margin-left:8px;vertical-align:middle}
+.score{display:flex;gap:8px;align-items:center;margin-top:14px;font:500 14px var(--mono);flex-wrap:wrap}
+.score span{border:2px solid var(--ink);padding:5px 10px;background:#fff}.score span.ok{background:var(--lime)}
+.score a{margin-left:auto}
+/* boitier */
+#v3d{height:min(440px,70vw);background:#fff;border:2px solid var(--ink);position:relative;cursor:grab}
+#v3d canvas{display:block;width:100%;height:100%}
+#v3d p{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;margin:0;color:var(--mute);text-align:center;padding:20px;font-size:16px}
+.hint{font:500 13px var(--mono);color:var(--mute);margin-top:8px}
+/* chiffres */
+.big{padding:56px 0;border-bottom:1px solid #39424a;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:center}
+.big:last-of-type{border-bottom:0}
+.num{font:500 clamp(84px,15vw,190px)/.9 var(--mono);color:var(--lime);letter-spacing:-4px}
+.num small{font-size:.38em;letter-spacing:0;color:#fff}
+.big p{font-size:clamp(20px,2.3vw,26px);margin:0;color:#e6ebee;max-width:430px}
+.big .src{display:block;margin-top:10px;font:400 13px var(--mono);color:#9aa6af}
+.big .src a{color:var(--cyan2)}
+.cmp{margin-top:18px;display:grid;gap:8px;max-width:430px}
+.cmp div{font:500 14px var(--mono);color:#e6ebee}
+.cmp i{display:block;height:20px;margin-bottom:4px;background:#6b7782;width:0;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.cmp i.hot{background:var(--lime)}
+.pct{height:22px;background:#39424a;margin-top:18px;max-width:430px}.pct i{display:block;height:100%;width:0;background:var(--lime);transition:width 1.6s cubic-bezier(.2,.8,.2,1)}
+.chip{display:inline-block;margin-top:14px;background:var(--red);color:#fff;font:500 16px var(--mono);padding:4px 10px}
+/* solution */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:40px;position:relative}
+.step{padding:0 24px 0 0}
+.step .n{width:64px;height:64px;background:var(--ink);color:#fff;font:500 28px var(--mono);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.step:nth-child(2) .n{background:var(--cyan)}.step:nth-child(3) .n{background:var(--lime);color:var(--ink)}
+.step h3{margin:0 0 6px;font-size:28px}.step p{margin:0;color:var(--mute);font-size:18px}
+.pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:40px}
+.pills span{border:2px solid var(--ink);padding:8px 14px;font-weight:700;font-size:16px;background:#fff}
+/* preuve */
+.proof{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.proof .num{color:var(--cyan)}.proof .num small{color:var(--ink)}
+.range{height:44px;background:#dfe5e9;position:relative;margin-top:22px;font:500 14px var(--mono)}
+.range i{position:absolute;top:0;bottom:0;left:0;width:0;background:var(--lime);transition:width 1.6s cubic-bezier(.2,.8,.2,1);display:flex;align-items:center;padding-left:10px;white-space:nowrap;overflow:hidden}
+/* dashboard */
+.two{display:grid;grid-template-columns:1fr 1.3fr;gap:40px;align-items:center}
+.shot{border:2px solid var(--ink);background:#fff;margin:0}.shot img{display:block;width:100%;height:auto}.shot figcaption{font-size:13px;color:var(--mute);padding:8px 10px;border-top:1px solid var(--line);background:var(--bg)}
+.ticks{list-style:none;padding:0;margin:26px 0 28px}
+.ticks li{font-size:22px;font-weight:700;padding:8px 0 8px 36px;position:relative}
+.ticks li:before{content:"";position:absolute;left:0;top:15px;width:22px;height:14px;background:var(--lime)}
+/* salon */
+.salon{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
+.salon div{border:2px solid #39424a;padding:22px 16px}
+.salon b{display:block;font:500 clamp(44px,6vw,72px)/1 var(--mono);color:var(--lime)}
+.salon span{font-size:16px;color:#d5dce1}
+/* agir */
+.road{display:flex;gap:0;margin:34px 0 0;flex-wrap:wrap}
+.road div{flex:1 1 200px;border-top:8px solid var(--line);padding:14px 16px 0 0}
+.road div:nth-child(1){border-color:var(--ink)}.road div:nth-child(2){border-color:var(--cyan)}.road div:nth-child(3){border-color:var(--lime)}
+.road b{display:block;font-size:22px}.road span{color:var(--mute);font-size:16px}
+.cta-final{background:var(--cyan);color:#fff}
+.cta-final h2{color:#fff}.cta-final .lead{color:#e3f3f6}
+.cta-final .btn{background:#fff;color:var(--ink);border-color:#fff;margin-top:30px}.cta-final .btn:hover{background:var(--lime);border-color:var(--lime)}
+details{border-bottom:1px solid var(--line);padding:14px 0;max-width:760px}summary{cursor:pointer;font-weight:700;font-size:20px}details p{margin:8px 0 0;color:var(--mute);font-size:17px}
+footer{background:var(--ink);color:#c8d0d6;padding:40px 0;font-size:14px}
+footer ol{columns:2;gap:36px;padding-left:18px}footer a{color:var(--cyan2)}footer .fl{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+@media (max-width:860px){.hero .grid,.proof,.two,.big{grid-template-columns:1fr}.steps{grid-template-columns:1fr;gap:28px}.salon{grid-template-columns:1fr 1fr}#dots{display:none}section{padding:64px 0;min-height:0}.hero{min-height:0}footer ol{columns:1}.hero .grid>*,.proof>*,.two>*{min-width:0}.hero .btn{display:block;text-align:center}}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.hero .walker,.b2{animation:none}.hero .walker{left:50%}html{scroll-behavior:auto}.cmp i,.pct i,.range i{transition:none}}
+</style></head><body>
+<div id="prog"></div>
+<header class="top"><div class="wrap"><a href="#top" aria-label="LAPS, haut de page"><svg style="height:34px;width:auto;display:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 282 80" role="img" aria-label="LAPS"><title>LAPS</title><rect x="10" y="12" width="9" height="56" fill="#1E2328"/><rect x="25" y="12" width="9" height="56" fill="#1E2328"/><rect x="40" y="12" width="9" height="56" fill="#1E2328"/><rect x="55" y="12" width="9" height="56" fill="#0A7686"/><rect x="70" y="12" width="9" height="56" fill="#8FBF1F"/><path transform="translate(104 0)" fill="#1E2328" d="M0 12H9V59H30V68H0Z"/><path transform="translate(140 0)" fill="#1E2328" fill-rule="evenodd" d="M0 68L18 12H26L44 68H34.5L30 54H14L9.5 68Z M16.9 45H27.1L22 29.1Z"/><path transform="translate(190 0)" fill="#1E2328" fill-rule="evenodd" d="M0 12H31L38 19V37L31 44H9V68H0Z M9 20V36H28L29 35V21L28 20Z"/><path transform="translate(234 0)" fill="none" stroke="#1E2328" stroke-width="9" stroke-linejoin="miter" stroke-miterlimit="4" d="M33.5 26V21L29 16.5H9L4.5 21V31L13 40H29L33.5 44.5V59L29 63.5H9L4.5 59V54"/></svg>
+</a><a class="btn sm" href="#probleme">Essayer</a></div></header>
+<nav id="dots" aria-label="Étapes de la page"><a href="#top"><span>01 Accueil</span></a><a href="#probleme"><span>02 Le problème</span></a><a href="#chiffres"><span>03 Les chiffres</span></a><a href="#solution"><span>04 La solution</span></a><a href="#boitier"><span>05 Le boîtier</span></a><a href="#preuve"><span>06 La preuve</span></a><a href="#collectivite"><span>07 Pour vous</span></a><a href="#salon"><span>08 Salon</span></a><a href="#agir"><span>09 Agir</span></a></nav>
+
+<main>
+<section class="dark hero" id="top"><div class="wrap grid"><div>
+<h1 class="rv">Chaque piéton doit pouvoir traverser <em>à son rythme</em>.</h1>
+<p class="lead rv d1">Laps prolonge le vert piéton, à la demande.</p>
+<div class="cta rv d2"><a class="btn" href="#probleme">Essayer la traversée</a><a class="btn alt" href="#boitier">Voir le boîtier</a></div></div>
+<div class="rv d2" role="img" aria-label="Animation : un piéton traverse lentement, le vert se prolonge grâce à Laps.">
+<div class="lane"><div class="zebra"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<svg class="walker" viewBox="0 0 26 44" aria-hidden="true"><circle cx="13" cy="6" r="5" fill="#fff"/><path d="M13 12v18M13 16L6 26M13 16l7 8M13 30l-6 12M13 30l6 12" stroke="#fff" stroke-width="3" fill="none"/><path d="M22 20v22" stroke="#8FBF1F" stroke-width="2"/></svg></div>
+<div class="bar"><span class="b1">Vert standard</span><span class="b2">+ Laps</span></div></div></div></section>
+
+<section id="probleme"><div class="wrap">
+<p class="tag rv"><b>02</b>LE PROBLÈME</p>
+<h2 class="rv d1">Le feu est réglé pour un seul rythme.</h2>
+<p class="lead rv d2">Testez : traversez 12 m, vert de 12 s.</p>
+<div class="game rv d2" id="game">
+<div class="ctrl"><div class="seg" role="group" aria-label="Choisir qui traverse"><button type="button" data-p="jeune" aria-pressed="false">Jeune adulte</button><button type="button" data-p="senior" aria-pressed="true">Senior</button><button type="button" data-p="groupe" aria-pressed="false">Groupe scolaire</button></div>
+<label class="sw"><input type="checkbox" id="laps"><i></i>Laps</label><button class="btn" type="button" id="go">Traverser</button></div>
+<div id="stage" aria-label="Simulation d'une traversée">
+<div class="sidew l"></div><div class="gameroad"></div><div class="sidew r"></div><div class="zb"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="plight" aria-hidden="true"><i class="r"></i><i class="g"></i><small>PIÉTONS</small></div>
+<div id="actors"></div><div id="cars"></div>
+<svg id="fx" viewBox="-50 -50 100 100" aria-hidden="true"><polygon points="0,-48 9,-18 40,-30 20,-6 48,6 18,14 28,44 0,24 -28,44 -18,14 -48,6 -20,-6 -40,-30 -9,-18" fill="#F2C14E" stroke="#fff" stroke-width="3"/></svg>
+<div id="flash"></div></div>
+<div class="hud"><span id="hv">Vert : 12 s</span><div class="gbar" aria-hidden="true"><b id="gb1"></b><u id="gb2"></u></div><span id="ht">0,0 s</span></div>
+<div class="res" id="res" role="status" aria-live="polite">Choisissez qui traverse, puis lancez.</div>
+<div class="score" id="score"><span data-k="jeune">Jeune</span><span data-k="senior">Senior</span><span data-k="groupe">Groupe</span><span id="scoretxt">Sauvez les trois avec Laps.</span><a class="btn sm" id="next" href="#solution" hidden>Voir la solution</a></div></div>
+</div></section>
+
+<section class="dark" id="chiffres"><div class="wrap">
+<p class="tag rv"><b>03</b>LES CHIFFRES</p>
+<h2 class="rv d1">Ce n'est pas un détail.</h2>
+<div class="big"><div class="num" data-count="503">0</div><div class="rv"><p>piétons tués en 2025 en France métropolitaine.</p><span class="chip">+47 en un an</span><span class="src"><a href="#s1">ONISR</a>, bilan 2025</span></div></div>
+<div class="big"><div class="num" data-count="2.3" data-dec="1" data-suf="x">0</div><div class="rv"><p>de risque en plus après 85 ans, par minute passée à pied.</p>
+<div class="cmp" data-bars><div><i data-w="43"></i>75-84 ans : 5,1</div><div><i class="hot" data-w="100"></i>85 ans et plus : 11,9</div></div>
+<span class="src">tués par milliard de minutes à pied, 2024. <a href="#s2">ONISR</a>. Rapport calculé par l'équipe.</span></div></div>
+<div class="big"><div class="num" data-count="96" data-suf="&thinsp;%">0</div><div class="rv"><p>des répondants règlent les feux sur 1 m/s. Un senior marche à 0,8-0,9 m/s.</p>
+<div class="pct" data-bars><i data-w="96"></i></div>
+<span class="src"><a href="#s3">Cerema</a>, enquête auprès de gestionnaires. <a href="#s4">Vitesse des plus de 65 ans</a>.</span></div></div>
+</div></section>
+
+<section id="solution" class="alt"><div class="wrap">
+<p class="tag rv"><b>04</b>LA SOLUTION</p>
+<h2 class="rv d1">Un boîtier. Trois gestes.</h2>
+<div class="steps">
+<div class="step rv"><div class="n">1</div><h3>Je me signale</h3><p>Carte ou capteur de marche.</p></div>
+<div class="step rv d1"><div class="n">2</div><h3>Le vert s'allonge</h3><p>Quelques secondes, juste pour moi.</p></div>
+<div class="step rv d2"><div class="n">3</div><h3>Le cycle reprend</h3><p>Sans demande, rien ne change.</p></div></div>
+<div class="pills rv"><span>Sur les feux existants</span><span>À la demande</span><span>Sans donnée personnelle</span></div>
+</div></section>
+
+<section id="boitier" class="alt"><div class="wrap two"><div>
+<p class="tag rv"><b>05</b>LE BOÎTIER</p>
+<h2 class="rv d1">Voici le prototype.</h2>
+<p class="lead rv d2">Modèle 3D. Faites-le tourner.</p></div>
+<div class="rv d1"><div id="v3d" aria-label="Modèle 3D du boîtier Laps, à faire tourner à la souris ou au doigt"><p>Chargement du modèle 3D...</p></div><p class="hint">Glisser pour tourner. Nécessite une connexion.</p></div></div></section>
+
+<section id="preuve"><div class="wrap proof"><div>
+<p class="tag rv"><b>06</b>LA PREUVE</p>
+<h2 class="rv d1">Ça marche déjà à Singapour.</h2>
+<p class="lead rv d2">Programme Green Man+ de l'agence LTA.</p></div>
+<div class="rv d1"><div class="num" data-count="1000" data-suf="+">0</div><p style="font-size:22px;margin:6px 0 0">passages équipés. <a href="#s5" style="font-size:14px">LTA</a></p>
+<div class="range" data-bars><i data-w="100">+3 à +13 s, selon la largeur</i></div></div></div></section>
+
+<section id="collectivite" class="alt"><div class="wrap two"><div>
+<p class="tag rv"><b>07</b>POUR LA COLLECTIVITÉ</p>
+<h2 class="rv d1">Voyez où l'on a besoin de temps.</h2>
+<ul class="ticks rv d2"><li>Carte des passages</li><li>Priorités d'aménagement</li><li>Rapport en un clic</li></ul>
+<a class="btn rv d2" href="#salon">Voir notre terrain</a></div>
+<figure class="shot rv d1"><img src="img/dashboard.png" alt="Aperçu du tableau de bord Laps" loading="lazy"><figcaption>Tableau de bord. Données d'usage simulées.</figcaption></figure></div></section>
+
+<section id="salon" class="dark"><div class="wrap">
+<p class="tag rv"><b>08</b>NOTRE TERRAIN</p>
+<h2 class="rv d1">Salon-de-Provence, toute la ville.</h2>
+<div class="salon">
+<div class="rv"><b data-count="9042">0</b><span>habitants de 65 ans et +, soit 20,5 % <a href="#s6" style="color:#6FD3E3">INSEE</a></span></div>
+<div class="rv d1"><b data-count="5">0</b><span>EHPAD, et d'autres résidences seniors <a href="#s7" style="color:#6FD3E3">source</a></span></div>
+<div class="rv d2"><b data-count="18">0</b><span>carrefours à feux repérés, un minimum <a href="#s8" style="color:#6FD3E3">OSM</a></span></div>
+<div class="rv d3"><b data-count="43">0</b><span>établissements scolaires <a href="#s9" style="color:#6FD3E3">Éducation nat.</a></span></div></div>
+</div></section>
+
+<section id="agir" class="cta-final"><div class="wrap">
+<p class="tag rv" style="color:#cfeaf0"><b style="background:#fff;color:var(--ink)">09</b>AGIR</p>
+<h2 class="rv d1">Équipons les premiers passages.</h2>
+<p class="lead rv d2">Du prototype au pilote en ville.</p>
+<div class="road rv d2"><div><b>Prototype</b><span>essais avec le gestionnaire</span></div><div><b>Industrialisation</b><span>marquage CE, boîtier scellé</span></div><div><b>Pilote en ville</b><span>hôpitaux, résidences, marchés</span></div></div>
+<a class="btn rv d3" href="#probleme">Rejouer la traversée</a></div></section>
+
+<section style="min-height:0;padding:56px 0"><div class="wrap"><p class="tag"><b>?</b>QUESTIONS</p>
+<details><summary>Qui gère les feux ?</summary><p>Le gestionnaire de voirie : commune ou métropole. Achat par marché public.</p></details>
+<details><summary>Et la réglementation ?</summary><p>La modification des temps de feu par un tiers reste à vérifier avec le gestionnaire et le Cerema.</p></details>
+<details><summary>Et les données personnelles ?</summary><p>Aucune donnée collectée sur la personne : un jeton "temps supplémentaire", sans handicap ni historique de trajets.</p></details>
+<details><summary>Et les voitures ?</summary><p>L'extension est à la demande et plafonnée. Le tableau de bord permet d'en simuler l'effet.</p></details></div></section>
+</main>
+
+<footer><div class="wrap"><div class="fl"><svg style="height:34px;width:auto;display:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 282 80" role="img" aria-label="LAPS"><title>LAPS</title><rect x="10" y="12" width="9" height="56" fill="#FFFFFF"/><rect x="25" y="12" width="9" height="56" fill="#FFFFFF"/><rect x="40" y="12" width="9" height="56" fill="#FFFFFF"/><rect x="55" y="12" width="9" height="56" fill="#6FD3E3"/><rect x="70" y="12" width="9" height="56" fill="#8FBF1F"/><path transform="translate(104 0)" fill="#FFFFFF" d="M0 12H9V59H30V68H0Z"/><path transform="translate(140 0)" fill="#FFFFFF" fill-rule="evenodd" d="M0 68L18 12H26L44 68H34.5L30 54H14L9.5 68Z M16.9 45H27.1L22 29.1Z"/><path transform="translate(190 0)" fill="#FFFFFF" fill-rule="evenodd" d="M0 12H31L38 19V37L31 44H9V68H0Z M9 20V36H28L29 35V21L28 20Z"/><path transform="translate(234 0)" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linejoin="miter" stroke-miterlimit="4" d="M33.5 26V21L29 16.5H9L4.5 21V31L13 40H29L33.5 44.5V59L29 63.5H9L4.5 59V54"/></svg>
+<span>Maquette de travail. Projet BG5, Pépite Provence 36h Chrono.</span></div>
+<p>Sources (consultées en novembre 2026)</p><ol>
+<li id="s1"><a href="https://www.onisr.securite-routiere.gouv.fr/etat-de-linsecurite-routiere/bilans-annuels-de-la-securite-routiere/bilan-2025-de-la-securite-routiere">ONISR, bilan 2025</a></li>
+<li id="s2"><a href="https://www.onisr.securite-routiere.gouv.fr/sites/default/files/2025-05/2025%2005%2028%20Chiffres%20cles%202024%20definitifs%20v4.pdf">ONISR, chiffres clés 2024</a></li>
+<li id="s3"><a href="https://cerema.fr/fr/system/files/documents/2017/10/PCITCV_rapport_etude_questionnaire_feux_cle027b4d.pdf">Cerema, étude sur les carrefours à feux</a></li>
+<li id="s4"><a href="https://pediatrie.lequotidiendumedecin.fr/actus-medicales/sante-publique/dangereuses-traversees">Le Quotidien du Médecin, vitesse de marche</a></li>
+<li id="s5"><a href="https://lta.gov.sg/content/ltagov/en/getting_around/driving_in_singapore/intelligent_transport_systems/green_man.html">LTA Singapour, Green Man+</a></li>
+<li id="s6"><a href="https://www.insee.fr/fr/statistiques/2011101?geo=COM-13103">INSEE, Salon-de-Provence, 2023</a></li>
+<li id="s7"><a href="https://www.conseildependance.fr/maison-retraite/bouches-du-rhone-13/salon-de-provence/">Conseil Dépendance, Salon-de-Provence</a></li>
+<li id="s8"><a href="https://www.openstreetmap.org/">OpenStreetMap (ODbL), 12/11/2026, regroupement par l'équipe</a></li>
+<li id="s9"><a href="https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/">Annuaire de l'éducation</a></li></ol></div></footer>
+
+<script>
+(function(){
+var RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function $(s,r){return (r||document).querySelector(s);}
+function fmt(n,dec){return n.toLocaleString('fr-FR',{minimumFractionDigits:dec||0,maximumFractionDigits:dec||0});}
+/* révélations, compteurs, barres */
+function count(el){
+  var to=parseFloat(el.dataset.count),dec=+el.dataset.dec||0,suf=el.dataset.suf||'',t0=null,dur=1500;
+  function put(v){el.innerHTML=fmt(v,dec)+(suf?'<small>'+suf+'</small>':'');}
+  if(RM){put(to);return;}
+  function step(t){if(!t0)t0=t;var p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);put(to*e);if(p<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+var io=new IntersectionObserver(function(es){es.forEach(function(e){
+  if(!e.isIntersecting)return;var el=e.target;io.unobserve(el);
+  if(el.classList.contains('rv'))el.classList.add('in');
+  if(el.dataset.count!==undefined)count(el);
+  if(el.hasAttribute('data-bars'))setTimeout(function(){el.querySelectorAll('[data-w]').forEach(function(b){b.style.width=b.dataset.w+'%';});},250);
+});},{threshold:.25});
+document.querySelectorAll('.rv,[data-count],[data-bars]').forEach(function(el){io.observe(el);});
+/* progression et points */
+var secs=[].slice.call(document.querySelectorAll('main>section[id]')),dots=[].slice.call(document.querySelectorAll('#dots a'));
+function onScroll(){
+  var h=document.documentElement,p=h.scrollTop/(h.scrollHeight-h.clientHeight);$('#prog').style.width=(100*p)+'%';
+  var cur=0;secs.forEach(function(s,i){if(s.getBoundingClientRect().top<innerHeight*.45)cur=i;});
+  dots.forEach(function(d,i){d.classList.toggle('on',i===cur);});
+}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+/* jeu */
+var DIST=12,GREEN=12,CAP=15,K=3,CAR_T=1.15;
+var PROF={jeune:{v:1.3,n:'jeune'},senior:{v:0.8,n:'senior'},groupe:{v:0.8,n:'groupe'}};
+var cur='senior',raf=null,done={};
+var stage=$('#stage'),actors=$('#actors'),cars=$('#cars');
+function sprite(kind,col,idx){
+  var skin='#F2C9A0',hair=kind==='senior'?'#EEF0F1':(kind==='kid'?'#6b4a2f':'#2a2a2a'),shirt=col||'#0A7686',pants=kind==='kid'?'#5b6b8c':'#c9d2d9',vest=kind==='teacher';
+  if(kind==='senior'){shirt='#B98B5E';pants='#d7d0c4';}
+  if(kind==='teacher'){shirt='#e8ecef';pants='#9db0c0';}
+  var s='<svg viewBox="0 -30 40 130" aria-hidden="true">';
+  s+='<g class="l1"><line x1="20" y1="56" x2="20" y2="92" stroke="'+pants+'" stroke-width="7"/><rect x="18" y="90" width="12" height="6" fill="#fff"/></g>';
+  s+='<g class="l2"><line x1="20" y1="56" x2="20" y2="92" stroke="'+pants+'" stroke-width="7" opacity=".85"/><rect x="18" y="90" width="12" height="6" fill="#dfe5e9"/></g>';
+  var body='<g class="a1"><line x1="20" y1="28" x2="20" y2="52" stroke="'+shirt+'" stroke-width="5" opacity=".85"/><circle cx="20" cy="54" r="3" fill="'+skin+'"/></g>';
+  if(kind==='kid')body+='<rect x="7" y="26" width="9" height="22" fill="'+(idx%2?'#F2A21E':'#D6352B')+'"/>';
+  body+='<polygon points="12,24 28,24 27,60 13,60" fill="'+shirt+'"/>';
+  if(vest)body+='<polygon points="12,24 28,24 27,60 13,60" fill="#F2A21E"/><rect x="12.5" y="38" width="15" height="3" fill="#fff"/><rect x="13" y="50" width="14" height="3" fill="#fff"/>';
+  body+='<circle cx="20" cy="13" r="8.5" fill="'+skin+'"/><path d="M11.5 12 A8.6 8.6 0 0 1 28.5 12 L28.5 9 A8.6 8 0 0 0 11.5 9Z" fill="'+hair+'"/>';
+  if(kind==='senior')body+='<rect x="22" y="11" width="7" height="3" fill="none" stroke="#1E2328" stroke-width="1"/><path d="M12 10 Q20 2 28 10 L27 8 Q20 0 13 8Z" fill="'+hair+'"/>';
+  if(vest)body+='<g class="armup"><line x1="20" y1="28" x2="20" y2="52" stroke="#F2A21E" stroke-width="5"/><circle cx="20" cy="54" r="3" fill="'+skin+'"/><g class="sign"><line x1="20" y1="-8" x2="20" y2="-14" stroke="#1E2328" stroke-width="2"/></g></g><g class="sign"><circle cx="20" cy="-30" r="0" fill="none"/></g>';
+  else body+='<g class="a2"><line x1="20" y1="28" x2="20" y2="52" stroke="'+shirt+'" stroke-width="5"/><circle cx="20" cy="54" r="3" fill="'+skin+'"/></g>';
+  if(kind==='senior')s+='<g transform="rotate(13 20 58)">'+body+'</g><line x1="30" y1="50" x2="33" y2="95" stroke="#8FBF1F" stroke-width="3.5"/><line x1="30" y1="50" x2="26" y2="49" stroke="#8FBF1F" stroke-width="3.5"/>';
+  else s+=body;
+  if(vest)s+='<g class="sign"><line x1="20" y1="-8" x2="20" y2="-18" stroke="#1E2328" stroke-width="2.5"/><circle cx="20" cy="-26" r="9" fill="#D6352B" stroke="#fff" stroke-width="2"/><rect x="14" y="-28.5" width="12" height="5" fill="#fff"/></g>';
+  return s+'</svg>';
+}
+function carSVG(c){return '<svg viewBox="0 0 40 80" aria-hidden="true"><rect x="3" y="2" width="34" height="76" fill="'+c+'"/><rect x="8" y="20" width="24" height="15" fill="#26323c"/><rect x="8" y="50" width="24" height="11" fill="#26323c"/><rect x="5" y="2" width="9" height="4" fill="#D6352B"/><rect x="26" y="2" width="9" height="4" fill="#D6352B"/><rect x="5" y="73" width="9" height="4" fill="#F2C14E"/><rect x="26" y="73" width="9" height="4" fill="#F2C14E"/><rect x="0" y="30" width="4" height="8" fill="#9aa6af"/><rect x="36" y="30" width="4" height="8" fill="#9aa6af"/></svg>';}
+function H(){return stage.clientHeight;}
+function mx(m){return 20+60*m/DIST;} /* mètres -> % de largeur */
+var members=[];
+function build(){
+  actors.innerHTML='';members=[];
+  var H0=H();
+  var list=cur==='groupe'?[['teacher'],['kid','#E4735A'],['kid','#F2C14E'],['kid','#6FD3E3'],['kid','#8FBF1F'],['kid','#E4735A'],['teacher']]:[[cur==='senior'?'senior':'adult','#0A7686']];
+  var n=list.length;
+  list.forEach(function(m,i){
+    var d=document.createElement('div');d.className='who';
+    var kid=m[0]==='kid';
+    d.style.height=((kid?.46:.72)*H0)+'px';d.style.bottom=(.04*H0)+'px';
+    d.innerHTML=sprite(m[0]==='adult'?'adult':m[0],m[1],i);
+    d.style.zIndex=10+i;
+    if(cur==='groupe'){d.dataset.off=((n-1-i)*0.6);}else d.dataset.off=0;
+    actors.appendChild(d);members.push(d);
+  });
+  var prof=PROF[cur];
+  members.forEach(function(d){d.style.setProperty('--dur',(cur==='jeune'?.5:.8)+'s');d.style.setProperty('--ang',(cur==='senior'?14:cur==='groupe'?20:30)+'deg');});
+}
+function ext(){var v=PROF[cur].v,L=DIST+(cur==='groupe'?3.6:0);return $('#laps').checked&&L/v>GREEN?Math.min(CAP,Math.ceil(L/v-GREEN)):0;}
+function lenOf(){return DIST+(cur==='groupe'?3.6:0);}
+function setLight(g){document.querySelector('.plight .g').classList.toggle('on',g);document.querySelector('.plight .r').classList.toggle('on',!g);}
+function place(x){ /* x = position du dernier (mètres, 0 = bord du trottoir) */
+  members.forEach(function(d){var xm=x+parseFloat(d.dataset.off);d.style.left=Math.min(96,mx(xm))+'%';});
+}
+function xStart(){return cur==='groupe'?-3.8:0;}
+function bars(g){var L=lenOf(),tot=Math.max(GREEN+ext(),L/PROF[cur].v);$('#gb1').style.width=(100*GREEN/tot)+'%';var u=$('#gb2');u.style.left=(100*GREEN/tot)+'%';u.style.width=(100*Math.max(0,g-GREEN)/tot)+'%';}
+function makeCars(){
+  cars.innerHTML='';var Hh=H(),ch=.34*Hh,cw=ch/2,out=[];
+  [35,65].forEach(function(p,i){var c=document.createElement('div');c.className='car';c.style.height=ch+'px';c.style.width=cw+'px';c.style.left=p+'%';c.style.top=(.14*Hh-ch)+'px';c.innerHTML=carSVG(i?'#F2C14E':'#dfe5e9');cars.appendChild(c);out.push({el:c,x:p});});
+  return out;
+}
+function setStop(on){members.forEach(function(d){if(d.querySelector('.armup'))d.classList.toggle('stop',on);});}
+function walking(on){members.forEach(function(d){d.classList.toggle('walking',on);});}
+var carList=[];
+function reset(){cancelAnimationFrame(raf);raf=null;stage.classList.remove('shake');$('#fx').classList.remove('on');$('#flash').classList.remove('on');
+  build();carList=makeCars();setLight(true);place(xStart());walking(false);setStop(false);
+  var e=ext(),v=PROF[cur].v,L=lenOf(),need=L/v;bars(GREEN+e);
+  $('#hv').textContent='Vert : '+GREEN+(e?' + '+e:'')+' s';$('#ht').textContent='0,0 s';
+  var r=$('#res');r.className='res';
+  r.innerHTML=(need<=GREEN)?'Il passe dans le vert standard.<small>Laps ne se déclenche pas.</small>':(cur==='groupe'?'Il leur faut ':'Il lui faut ')+fmt(need,0)+' s pour '+GREEN+' s de vert.<small>'+(cur==='groupe'?'Un groupe de 5 enfants et 2 enseignants.':cur==='senior'?'Un senior marche à environ 0,8 m/s.':'')+'</small>';
+  $('#go').textContent='Traverser';}
+function mark(k){done[k]=true;var n=0;document.querySelectorAll('#score span[data-k]').forEach(function(s){if(done[s.dataset.k]){s.classList.add('ok');n++;}});
+  $('#scoretxt').textContent=n===3?'Les trois traversent. Voilà ce que fait Laps.':n+' sur 3 sauvés.';if(n===3)$('#next').hidden=false;}
+function pickProf(b){document.querySelectorAll('.seg button').forEach(function(x){x.setAttribute('aria-pressed','false');});b.setAttribute('aria-pressed','true');cur=b.dataset.p;reset();}
+document.querySelectorAll('.seg button').forEach(function(b){b.addEventListener('click',function(){pickProf(b);});});
+$('#laps').addEventListener('change',reset);
+$('#go').addEventListener('click',function(){
+  reset();var e=ext(),v=PROF[cur].v,L=lenOf(),end=GREEN+e,t=0,last=null,phase='walk',redAt=0,carT=0,x0=xStart(),x=x0,over=false,r=$('#res'),Hh=H();
+  walking(true);
+  var wait=.14*Hh, hitY=.68*Hh, stopY=.33*Hh;
+  var tgt=null;
+  function finish(msg,cls,mk){over=true;walking(false);r.className='res '+cls;r.innerHTML=msg;if(mk)mark(cur);}
+  function frame(ts){
+    if(last===null)last=ts;var dt=Math.min(.05,(ts-last)/1000);last=ts;
+    if(phase==='walk'){
+      t+=dt*K;x=x0+v*t;place(x);setLight(true);$('#ht').textContent=fmt(t,1)+' s';
+      if(x>=x0+L){walking(false);$('#ht').textContent=fmt(L/v,1)+' s';finish('Arrivé à temps, en '+fmt(L/v,0)+' s.'+(e?'<span class="badge">+'+e+' s Laps</span>':'')+'<small>'+(cur==='groupe'?'Les enfants ont traversé sans que personne bloque la route.':'Le feu a attendu.')+'</small>','ok',(e>0||cur==='jeune'));return;}
+      if(t>=end){phase='red';setLight(false);redAt=t;carT=0;
+        var remain=(x0+L)-x;
+        if(cur==='groupe'){setStop(true);tgt='stop';}
+        else if(remain/v>CAR_T){tgt='hit';}
+        else tgt='pass';
+      }
+    }else if(phase==='red'){
+      var k=(tgt==='hit'||tgt==='pass')?1:K;
+      t+=dt*k;carT+=dt;x=Math.min(x0+L,x0+v*t);place(x);$('#ht').textContent=fmt(t,1)+' s';
+      var s=Math.min(1,carT/CAR_T),ease=s*s;
+      carList.forEach(function(c,i){
+        var ch=c.el.clientHeight,bot=wait+( (tgt==='stop'?stopY:hitY)-wait)*ease;
+        if(tgt==='pass')bot=wait+(1.2*Hh-wait)*ease;
+        if(tgt==='hit'&&i===0&&false){}
+        c.el.style.top=(bot-ch)+'px';
+      });
+      /* voiture dans la voie du piéton : alignée sur sa position à l'arrivée */
+      if(tgt==='hit'){var px=mx(x+v*Math.max(0,CAR_T-carT)+0);carList[0].el.style.left=px+'%';carList[0].x=px;}
+      if(tgt==='hit'&&s>=1){
+        over=true;walking(false);members[0].classList.add('fall');
+        var fx=$('#fx');fx.style.left=carList[0].x+'%';fx.style.top=(hitY-.1*Hh)+'px';fx.classList.add('on');
+        stage.classList.add('shake');$('#flash').classList.add('on');setTimeout(function(){$('#flash').classList.remove('on');},300);
+        $('#ht').textContent=fmt(t,1)+' s';
+        finish('Collision.<small>Le vert s\'est arrêté à '+fmt(Math.max(0,(x0+L)-x),0)+' m de l\'arrivée. C\'est ce que Laps évite. En 2025, 503 piétons sont morts sur les routes (ONISR).</small>','bad',false);return;}
+      if(tgt==='pass'&&s>=1){finish('Passé de justesse.<small>Le feu était déjà rouge.</small>','warn',false);return;}
+      if(tgt==='stop'&&s>=1){
+        /* le groupe termine sa traversée, les enseignants bloquent la route */
+        if(x>=x0+L){walking(false);setStop(false);finish('Les 2 enseignants ont dû arrêter les voitures.<small>Le groupe est passé, mais le feu était rouge. Avec Laps, le vert suffit.</small>','warn',false);return;}
+      }
+    }
+    if(!over)raf=requestAnimationFrame(frame);
+  }
+  raf=requestAnimationFrame(frame);});
+window.addEventListener('resize',function(){if(!raf)reset();});
+reset();
+})();
+</script><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+var box=document.getElementById('v3d'),started=false;
+function fail(m){box.innerHTML='<p>'+m+'</p>';}
+async function start(){
+  if(started)return;started=true;
+  try{
+    await new Promise(function(ok,ko){var s=document.createElement('script');s.src='assets/boitier-stl.js';s.onload=ok;s.onerror=ko;document.head.appendChild(s);});
+    var THREE=await import('three'),L=await import('three/addons/loaders/STLLoader.js'),O=await import('three/addons/controls/OrbitControls.js');
+    var bin=atob(window.BOITIER_B64),buf=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i);
+    var geo=new L.STLLoader().parse(buf.buffer);geo.center();geo.computeVertexNormals();
+    box.innerHTML='';
+    var W=box.clientWidth,Hh=box.clientHeight,r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setPixelRatio(Math.min(2,devicePixelRatio));r.setSize(W,Hh);box.appendChild(r.domElement);
+    var sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(32,W/Hh,1,2000);
+    var mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x0A7686,roughness:.42,metalness:.15}));mesh.rotation.x=-Math.PI/2;sc.add(mesh);
+    var ed=new THREE.LineSegments(new THREE.EdgesGeometry(geo,35),new THREE.LineBasicMaterial({color:0x1E2328,transparent:true,opacity:.45}));ed.rotation.x=-Math.PI/2;sc.add(ed);
+    sc.add(new THREE.HemisphereLight(0xffffff,0x8899aa,1.1));var dl=new THREE.DirectionalLight(0xffffff,1.6);dl.position.set(120,200,160);sc.add(dl);
+    geo.computeBoundingSphere();var rad=geo.boundingSphere.radius;cam.position.set(rad*1.3,rad*1.0,rad*2.3);
+    var c=new O.OrbitControls(cam,r.domElement);c.enableZoom=false;c.enablePan=false;c.autoRotate=true;c.autoRotateSpeed=2.2;c.enableDamping=true;
+    addEventListener('resize',function(){var w=box.clientWidth,h=box.clientHeight;r.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix();});
+    (function loop(){c.update();r.render(sc,cam);requestAnimationFrame(loop);})();
+  }catch(e){fail('Modèle 3D indisponible (connexion nécessaire). Fichier : assets/boitier-stl.js');console.error(e);}
+}
+new IntersectionObserver(function(es,o){if(es[0].isIntersecting){o.disconnect();start();}},{rootMargin:'300px'}).observe(box);
+</script>
+</body></html>
