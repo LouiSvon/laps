@@ -179,6 +179,7 @@ footer ol{columns:2;gap:36px;padding-left:18px}footer a{color:var(--cyan2)}foote
 .calc2 label{display:block;font-weight:700;margin-bottom:6px}
 .calc2 input[type=range]{width:100%;accent-color:var(--lime);margin:6px 0 16px}
 .calc2 .res2{font:500 clamp(28px,4vw,40px)/1.1 var(--mono);color:#fff}
+.perh{margin-top:18px;border-top:2px solid var(--lime);padding-top:14px}.ph{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:6px 0;border-bottom:1px solid #39424a}.ph span{font-size:16px;color:#e6ebee}.ph b{font:500 22px var(--mono);color:var(--lime);white-space:nowrap}
 .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:34px}
 .chips div{border-top:6px solid var(--cyan2);background:#2a3138;padding:14px 16px}
 .chips b{display:block;font:500 24px var(--mono);color:#fff;margin-bottom:4px}
@@ -257,7 +258,11 @@ footer ol{columns:2;gap:36px;padding-left:18px}footer a{color:var(--cyan2)}foote
 <div id="bomBar" aria-hidden="true"></div><ul id="bomList"></ul></div>
 <div class="calc2 rv d1"><label for="nc">Carrefours équipés : <span id="ncv">18</span></label><input id="nc" type="range" min="1" max="30" step="1" value="18">
 <p class="lbl">Composants et pose (200 à 400 € par carrefour) :</p><div class="res2" id="bomRes">0</div>
-<p class="lbl" style="margin-top:12px">18 : carrefours à feux repérés à Salon-de-Provence. 30 : taille de la première série.</p></div></div>
+<p class="lbl" style="margin-top:12px">18 : carrefours à feux repérés à Salon-de-Provence. 30 : taille de la première série.</p>
+<div class="perh"><p class="lbl"><b>Le vrai coût : le total divisé par ceux qui en profitent.</b></p>
+<div class="ph"><span>Par habitant de Salon (44 194)</span><b id="ph1">0</b></div>
+<div class="ph"><span>Par habitant de 65 ans et plus (9 042)</span><b id="ph2">0</b></div>
+<p class="lbl" style="font-size:13px;margin-top:8px">Coût unique, hors frais fixes. Population : <a href="#s6" style="color:#6FD3E3">INSEE 2023</a>.</p></div></div></div>
 <div class="chips rv"><div><b>3 à 8 k€</b><span>marquage CE en laboratoire (jusqu'à 20 k€ si la radio est complexe)</span></div>
 <div><b>1 à 3 k€</b><span>dossier technique, plus l'achat des normes</span></div>
 <div><b>1,5 à 4 k€</b><span>tests d'usage avec les habitants</span></div>
@@ -482,7 +487,10 @@ function render(){
   setTimeout(function(){b.querySelectorAll('i').forEach(function(e){e.style.width=e.dataset.w+'%';});},30);
   l.innerHTML=BOM[mode].map(function(c,i){return '<li><i style="background:'+COL[i]+'"></i>'+c[0]+'<b>'+f(c[1])+' €</b></li>';}).join('');
   var n=+document.getElementById('nc').value;document.getElementById('ncv').textContent=n;
-  document.getElementById('bomRes').textContent=f0(n*(t+200))+' à '+f0(n*(t+400))+' €';
+  var lo=n*(t+200),hi=n*(t+400);document.getElementById('bomRes').textContent=f0(lo)+' à '+f0(hi)+' €';
+  function pe(x){return x.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  document.getElementById('ph1').textContent=pe(lo/44194)+' à '+pe(hi/44194)+' €';
+  document.getElementById('ph2').textContent=pe(lo/9042)+' à '+pe(hi/9042)+' €';
 }
 document.querySelectorAll('#budget .seg button').forEach(function(x){x.addEventListener('click',function(){document.querySelectorAll('#budget .seg button').forEach(function(y){y.setAttribute('aria-pressed','false');});x.setAttribute('aria-pressed','true');mode=x.dataset.m;render();});});
 document.getElementById('nc').addEventListener('input',render);
