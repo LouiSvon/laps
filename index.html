@@ -163,12 +163,41 @@ details{border-bottom:1px solid var(--line);padding:14px 0;max-width:760px}summa
 footer{background:var(--ink);color:#c8d0d6;padding:40px 0;font-size:14px}
 footer ol{columns:2;gap:36px;padding-left:18px}footer a{color:var(--cyan2)}footer .fl{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
 @media (max-width:860px){.hero .grid,.proof,.two,.big{grid-template-columns:1fr}.steps{grid-template-columns:1fr;gap:28px}.salon{grid-template-columns:1fr 1fr}#dots{display:none}section{padding:64px 0;min-height:0}.hero{min-height:0}footer ol{columns:1}.hero .grid>*,.proof>*,.two>*{min-width:0}.hero .btn{display:block;text-align:center}}
+
+/* 3D */
+#v3d{overflow:hidden}
+.l3{position:absolute;left:0;top:0;pointer-events:none;width:24px;height:24px;margin:-12px 0 0 -12px;background:var(--c);color:#1E2328;border:2px solid #1E2328;font:700 13px var(--mono);display:flex;align-items:center;justify-content:center;transition:opacity .3s;z-index:2}
+.leg{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:14px}
+.leg span{display:flex;gap:8px;align-items:center;font-size:15px;font-weight:700}
+.leg i{width:24px;height:24px;flex:none;background:var(--c);color:#1E2328;border:2px solid #1E2328;font:700 13px var(--mono);display:flex;align-items:center;justify-content:center;font-style:normal}
+.leg em{font:500 13px var(--mono);color:var(--mute);font-style:normal;font-weight:400}
+.bar3{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+/* prix */
+.prices{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:34px}
+.price{border:2px solid #39424a;border-top:8px solid var(--lime);padding:26px 24px}
+.price:nth-child(2){border-top-color:var(--cyan2)}
+.price b{display:block;font:500 clamp(64px,10vw,120px)/1 var(--mono);color:var(--lime);letter-spacing:-3px}
+.price:nth-child(2) b{color:var(--cyan2)}
+.price b small{font-size:.28em;letter-spacing:0;color:#fff;margin-left:8px}
+.price p{margin:10px 0 0;font-size:clamp(19px,2.2vw,24px);font-weight:700}
+.price span{display:block;color:#c8d0d6;font-size:16px;margin-top:4px}
+.lbl{font-size:16px;color:#c8d0d6;margin:0}
+.calc2{border:2px solid #39424a;padding:22px;margin-top:20px}
+.calc2 label{display:block;font-weight:700;margin-bottom:6px}
+.calc2 input[type=range]{width:100%;accent-color:var(--lime);margin:6px 0 16px}
+.calc2 .two2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.calc2 .res2{font:500 clamp(26px,3.6vw,38px)/1.1 var(--mono);color:#fff}
+.calc2 .res2 small{font-size:.5em;color:#c8d0d6}
+.perh{margin-top:18px;border-top:2px solid var(--lime);padding-top:14px}
+.ph{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:6px 0;border-bottom:1px solid #39424a}
+.ph span{font-size:16px;color:#e6ebee}.ph b{font:500 20px var(--mono);color:var(--lime);text-align:right}
+@media (max-width:860px){.prices,.calc2 .two2{grid-template-columns:1fr}.ph{flex-direction:column;align-items:flex-start}.ph b{text-align:left}}
 @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.hero .walker,.b2{animation:none}.hero .walker{left:50%}html{scroll-behavior:auto}.cmp i,.pct i,.range i{transition:none}}
 </style></head><body>
 <div id="prog"></div>
 <header class="top"><div class="wrap"><a href="#top" aria-label="LAPS, haut de page"><svg style="height:34px;width:auto;display:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 282 80" role="img" aria-label="LAPS"><title>LAPS</title><rect x="10" y="12" width="9" height="56" fill="#1E2328"/><rect x="25" y="12" width="9" height="56" fill="#1E2328"/><rect x="40" y="12" width="9" height="56" fill="#1E2328"/><rect x="55" y="12" width="9" height="56" fill="#0A7686"/><rect x="70" y="12" width="9" height="56" fill="#8FBF1F"/><path transform="translate(104 0)" fill="#1E2328" d="M0 12H9V59H30V68H0Z"/><path transform="translate(140 0)" fill="#1E2328" fill-rule="evenodd" d="M0 68L18 12H26L44 68H34.5L30 54H14L9.5 68Z M16.9 45H27.1L22 29.1Z"/><path transform="translate(190 0)" fill="#1E2328" fill-rule="evenodd" d="M0 12H31L38 19V37L31 44H9V68H0Z M9 20V36H28L29 35V21L28 20Z"/><path transform="translate(234 0)" fill="none" stroke="#1E2328" stroke-width="9" stroke-linejoin="miter" stroke-miterlimit="4" d="M33.5 26V21L29 16.5H9L4.5 21V31L13 40H29L33.5 44.5V59L29 63.5H9L4.5 59V54"/></svg>
 </a><a class="btn sm" href="#probleme">Essayer</a></div></header>
-<nav id="dots" aria-label="Étapes de la page"><a href="#top"><span>01 Accueil</span></a><a href="#probleme"><span>02 Le problème</span></a><a href="#chiffres"><span>03 Les chiffres</span></a><a href="#solution"><span>04 La solution</span></a><a href="#boitier"><span>05 Le boîtier</span></a><a href="#preuve"><span>06 La preuve</span></a><a href="#collectivite"><span>07 Pour vous</span></a><a href="#salon"><span>08 Salon</span></a><a href="#agir"><span>09 Agir</span></a></nav>
+<nav id="dots" aria-label="Étapes de la page"><a href="#top"><span>01 Accueil</span></a><a href="#probleme"><span>02 Le problème</span></a><a href="#chiffres"><span>03 Les chiffres</span></a><a href="#solution"><span>04 La solution</span></a><a href="#boitier"><span>05 Le boîtier</span></a><a href="#budget"><span>06 Le prix</span></a><a href="#preuve"><span>07 La preuve</span></a><a href="#collectivite"><span>08 Pour vous</span></a><a href="#salon"><span>09 Salon</span></a><a href="#agir"><span>10 Agir</span></a></nav>
 
 <main>
 <section class="dark hero" id="top"><div class="wrap grid"><div>
@@ -224,24 +253,39 @@ footer ol{columns:2;gap:36px;padding-left:18px}footer a{color:var(--cyan2)}foote
 <p class="tag rv"><b>05</b>LE BOÎTIER</p>
 <h2 class="rv d1">Voici le prototype.</h2>
 <p class="lead rv d2">Modèle 3D. Faites-le tourner.</p></div>
-<div class="rv d1"><div id="v3d" aria-label="Modèle 3D du boîtier Laps, à faire tourner à la souris ou au doigt"><p>Chargement du modèle 3D...</p></div><p class="hint">Glisser pour tourner. Nécessite une connexion.</p></div></div></section>
+<div class="rv d1"><div id="v3d" aria-label="Modèle 3D du boîtier Laps, à faire tourner à la souris ou au doigt"><p>Chargement du modèle 3D...</p></div><div class="bar3"><button class="btn sm" type="button" id="lidBtn">Fermer le boîtier</button><span class="hint" style="margin:0">Glisser pour tourner. Nécessite une connexion.</span></div><p class="hint">Composants schématiques : formes et positions indicatives, pas un plan de montage.</p><div class="leg"><span style="--c:#8FBF1F"><i>1</i>Microcontrôleur ESP32</span><span style="--c:#6FD3E3"><i>2</i>Module NB-IoT / LTE-M</span><span style="--c:#F2C14E"><i>3</i>Relais vers « demande piéton »</span><span style="--c:#E4735A"><i>4</i>Lecteur NFC</span><span style="--c:#9aa6af"><i>5</i>Boîtier IP67 / IK10</span></div></div></div></section>
+
+<section id="budget" class="dark"><div class="wrap">
+<p class="tag rv"><b>06</b>LE PRIX</p>
+<h2 class="rv d1">Un prix clair.</h2>
+<p class="lead rv d2">Par boîtier, pour la collectivité.</p>
+<div class="prices">
+<div class="price rv"><b data-count="250" data-suf="€">0</b><p>le boîtier, à l'unité</p></div>
+<div class="price rv d1"><b><span class="cnt" data-count="72" style="display:inline;color:inherit;font-size:inherit;margin:0">0</span><small>€ / an</small></b><p>l'abonnement, par boîtier</p><span>soit 6 € par mois</span></div></div>
+<div class="calc2 rv d1"><label for="nc">Carrefours équipés : <span id="ncv">18</span></label><input id="nc" type="range" min="1" max="30" step="1" value="18">
+<div class="two2"><div><p class="lbl">Achat</p><div class="res2" id="bAch">0</div></div><div><p class="lbl">Abonnement</p><div class="res2" id="bAbo">0</div></div></div>
+<div class="perh"><p class="lbl"><b>Le vrai coût : le total divisé par ceux qui en profitent.</b></p>
+<div class="ph"><span>Par habitant de Salon (44 194)</span><b id="ph1">0</b></div>
+<div class="ph"><span>Par habitant de 65 ans et plus (9 042)</span><b id="ph2">0</b></div></div>
+<p class="lbl" style="font-size:13px;margin-top:10px;color:#9aa6af">18 : carrefours à feux repérés à Salon-de-Provence. 30 : taille de la première série. Population : <a href="#s6" style="color:#6FD3E3">INSEE 2023</a>.</p></div>
+</div></section>
 
 <section id="preuve"><div class="wrap proof"><div>
-<p class="tag rv"><b>06</b>LA PREUVE</p>
+<p class="tag rv"><b>07</b>LA PREUVE</p>
 <h2 class="rv d1">Ça marche déjà à Singapour.</h2>
 <p class="lead rv d2">Programme Green Man+ de l'agence LTA.</p></div>
 <div class="rv d1"><div class="num" data-count="1000" data-suf="+">0</div><p style="font-size:22px;margin:6px 0 0">passages équipés. <a href="#s5" style="font-size:14px">LTA</a></p>
 <div class="range" data-bars><i data-w="100">+3 à +13 s, selon la largeur</i></div></div></div></section>
 
 <section id="collectivite" class="alt"><div class="wrap two"><div>
-<p class="tag rv"><b>07</b>POUR LA COLLECTIVITÉ</p>
+<p class="tag rv"><b>08</b>POUR LA COLLECTIVITÉ</p>
 <h2 class="rv d1">Voyez où l'on a besoin de temps.</h2>
 <ul class="ticks rv d2"><li>Carte des passages</li><li>Priorités d'aménagement</li><li>Rapport en un clic</li></ul>
 <a class="btn rv d2" href="#salon">Voir notre terrain</a></div>
 <figure class="shot rv d1"><img src="img/dashboard.png" alt="Aperçu du tableau de bord Laps" loading="lazy"><figcaption>Tableau de bord. Données d'usage simulées.</figcaption></figure></div></section>
 
 <section id="salon" class="dark"><div class="wrap">
-<p class="tag rv"><b>08</b>NOTRE TERRAIN</p>
+<p class="tag rv"><b>09</b>NOTRE TERRAIN</p>
 <h2 class="rv d1">Salon-de-Provence, toute la ville.</h2>
 <div class="salon">
 <div class="rv"><b data-count="9042">0</b><span>habitants de 65 ans et +, soit 20,5 % <a href="#s6" style="color:#6FD3E3">INSEE</a></span></div>
@@ -251,10 +295,10 @@ footer ol{columns:2;gap:36px;padding-left:18px}footer a{color:var(--cyan2)}foote
 </div></section>
 
 <section id="agir" class="cta-final"><div class="wrap">
-<p class="tag rv" style="color:#cfeaf0"><b style="background:#fff;color:var(--ink)">09</b>AGIR</p>
+<p class="tag rv" style="color:#cfeaf0"><b style="background:#fff;color:var(--ink)">10</b>AGIR</p>
 <h2 class="rv d1">Équipons les premiers passages.</h2>
 <p class="lead rv d2">Du prototype au pilote en ville.</p>
-<div class="road rv d2"><div><b>Prototype</b><span>essais avec le gestionnaire</span></div><div><b>Industrialisation</b><span>marquage CE, boîtier scellé</span></div><div><b>Pilote en ville</b><span>hôpitaux, résidences, marchés</span></div></div>
+<div class="road rv d2"><div><b>Prototype</b><span>essais avec le gestionnaire</span></div><div><b>Industrialisation</b><span>marquage CE, boîtier scellé</span></div><div><b>Pilote en ville</b><span>30 premiers boîtiers : hôpitaux, résidences, marchés</span></div></div>
 <a class="btn rv d3" href="#probleme">Rejouer la traversée</a></div></section>
 
 <section style="min-height:0;padding:56px 0"><div class="wrap"><p class="tag"><b>?</b>QUESTIONS</p>
@@ -376,8 +420,8 @@ function reset(){cancelAnimationFrame(raf);raf=null;stage.classList.remove('shak
   $('#go').textContent='Traverser';}
 function mark(k){done[k]=true;var n=0;document.querySelectorAll('#score span[data-k]').forEach(function(s){if(done[s.dataset.k]){s.classList.add('ok');n++;}});
   $('#scoretxt').textContent=n===3?'Les trois traversent. Voilà ce que fait Laps.':n+' sur 3 sauvés.';if(n===3)$('#next').hidden=false;}
-function pickProf(b){document.querySelectorAll('.seg button').forEach(function(x){x.setAttribute('aria-pressed','false');});b.setAttribute('aria-pressed','true');cur=b.dataset.p;reset();}
-document.querySelectorAll('.seg button').forEach(function(b){b.addEventListener('click',function(){pickProf(b);});});
+function pickProf(b){document.querySelectorAll('#game .seg button').forEach(function(x){x.setAttribute('aria-pressed','false');});b.setAttribute('aria-pressed','true');cur=b.dataset.p;reset();}
+document.querySelectorAll('#game .seg button').forEach(function(b){b.addEventListener('click',function(){pickProf(b);});});
 $('#laps').addEventListener('change',reset);
 $('#go').addEventListener('click',function(){
   reset();var e=ext(),v=PROF[cur].v,L=lenOf(),end=GREEN+e,t=0,last=null,phase='walk',redAt=0,carT=0,x0=xStart(),x=x0,over=false,r=$('#res'),Hh=H();
@@ -426,6 +470,21 @@ $('#go').addEventListener('click',function(){
 window.addEventListener('resize',function(){if(!raf)reset();});
 reset();
 })();
+
+/* prix */
+(function(){
+var P=250,A=72,POP=44194,SEN=9042;
+function f0(n){return Math.round(n).toLocaleString('fr-FR');}
+function pe(x){return x.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function render(){
+  var n=+document.getElementById('nc').value;document.getElementById('ncv').textContent=n;
+  document.getElementById('bAch').innerHTML=f0(n*P)+' <small>€</small>';
+  document.getElementById('bAbo').innerHTML=f0(n*A)+' <small>€ / an</small>';
+  document.getElementById('ph1').textContent=pe(n*P/POP)+' € une fois, '+pe(n*A/POP)+' € / an';
+  document.getElementById('ph2').textContent=pe(n*P/SEN)+' € une fois, '+pe(n*A/SEN)+' € / an';
+}
+document.getElementById('nc').addEventListener('input',render);render();
+})();
 </script><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
 var box=document.getElementById('v3d'),started=false;
@@ -433,20 +492,53 @@ function fail(m){box.innerHTML='<p>'+m+'</p>';}
 async function start(){
   if(started)return;started=true;
   try{
-    await new Promise(function(ok,ko){var s=document.createElement('script');s.src='assets/boitier-stl.js';s.onload=ok;s.onerror=ko;document.head.appendChild(s);});
+    await new Promise(function(ok,ko){var sc=document.createElement('script');sc.src='assets/boitier-stl.js';sc.onload=ok;sc.onerror=ko;document.head.appendChild(sc);});
     var THREE=await import('three'),L=await import('three/addons/loaders/STLLoader.js'),O=await import('three/addons/controls/OrbitControls.js');
     var bin=atob(window.BOITIER_B64),buf=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i);
-    var geo=new L.STLLoader().parse(buf.buffer);geo.center();geo.computeVertexNormals();
+    var geo=new L.STLLoader().parse(buf.buffer),pos=geo.attributes.position,nt=pos.count/3,bp=[],lp=[];
+    for(var t=0;t<nt;t++){var cx=(pos.getX(3*t)+pos.getX(3*t+1)+pos.getX(3*t+2))/3,a=cx<85?bp:lp;for(var k=0;k<3;k++)a.push(pos.getX(3*t+k),pos.getY(3*t+k),pos.getZ(3*t+k));}
+    function mk(arr,dx){var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));g.translate(dx,-28.4,-13);g.computeVertexNormals();return g;}
+    var gb=mk(bp,-40.4),gl=mk(lp,-131.2);
     box.innerHTML='';
     var W=box.clientWidth,Hh=box.clientHeight,r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setPixelRatio(Math.min(2,devicePixelRatio));r.setSize(W,Hh);box.appendChild(r.domElement);
     var sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(32,W/Hh,1,2000);
-    var mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x0A7686,roughness:.42,metalness:.15}));mesh.rotation.x=-Math.PI/2;sc.add(mesh);
-    var ed=new THREE.LineSegments(new THREE.EdgesGeometry(geo,35),new THREE.LineBasicMaterial({color:0x1E2328,transparent:true,opacity:.45}));ed.rotation.x=-Math.PI/2;sc.add(ed);
+    var stl=new THREE.Group();stl.rotation.x=-Math.PI/2;sc.add(stl);
+    var cm=new THREE.MeshStandardMaterial({color:0x8c99a4,roughness:.5,metalness:.2});
+    function part(g){var m=new THREE.Mesh(g,cm);m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g,35),new THREE.LineBasicMaterial({color:0x1E2328,transparent:true,opacity:.4})));stl.add(m);return m;}
+    var body=part(gb),lid=part(gl);
+    /* composants (repère du modèle, z vers le haut, cavité x ±38, y ±26, sol à z=-10,5, bord à z=13,5) */
+    var comps=new THREE.Group();stl.add(comps);var items=[];
+    function add(name,price,col,w,d,h,x,y,z,dark){
+      var m=new THREE.Mesh(new THREE.BoxGeometry(w,d,h),new THREE.MeshStandardMaterial({color:col,roughness:.45,metalness:.1,transparent:name==='Lecteur NFC',opacity:name==='Lecteur NFC'?.55:1}));
+      m.position.set(x,y,z+h/2);comps.add(m);
+      m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry),new THREE.LineBasicMaterial({color:0x1E2328,transparent:true,opacity:.5})));
+      if(name)items.push({m:m,name:name,price:price,col:col,top:h/2});return m;}
+    add(null,0,0x1d4d3f,68,44,1.6,0,0,-2.9);                                   /* circuit imprimé */
+    add('Microcontrôleur ESP32','',0x8FBF1F,18,25.5,3.1,-24,6,-1.3);
+    add('Module NB-IoT / LTE-M','',0x6FD3E3,24,24,3,2,8,-1.3);
+    add('Relais vers le feu','',0xF2C14E,15,12,9,26,-12,-1.3);
+    add('Lecteur NFC','',0xE4735A,40,28,1.4,0,-2,11.4);                   /* sous le couvercle */
+    items.push({m:body,name:'Boîtier IP67 / IK10',price:'',col:0x9aa6af,top:13,dx:-36,dy:-24,fixed:true});
+    var ov=document.createElement('div');box.appendChild(ov);
+    items.forEach(function(it,ix){var e=document.createElement('div');e.className='l3';e.style.setProperty('--c','#'+('000000'+it.col.toString(16)).slice(-6));e.textContent=String(ix+1);e.title=it.name;ov.appendChild(e);it.el=e;});
     sc.add(new THREE.HemisphereLight(0xffffff,0x8899aa,1.1));var dl=new THREE.DirectionalLight(0xffffff,1.6);dl.position.set(120,200,160);sc.add(dl);
-    geo.computeBoundingSphere();var rad=geo.boundingSphere.radius;cam.position.set(rad*1.3,rad*1.0,rad*2.3);
-    var c=new O.OrbitControls(cam,r.domElement);c.enableZoom=false;c.enablePan=false;c.autoRotate=true;c.autoRotateSpeed=2.2;c.enableDamping=true;
+    cam.position.set(95,90,125);
+    var c=new O.OrbitControls(cam,r.domElement);c.target.set(0,12,0);c.enableZoom=false;c.enablePan=false;c.autoRotate=true;c.autoRotateSpeed=1.1;c.enableDamping=true;
+    var open=true,lz=62,btn=document.getElementById('lidBtn');
+    btn.addEventListener('click',function(){open=!open;btn.textContent=open?'Fermer le boîtier':'Ouvrir le boîtier';});
     addEventListener('resize',function(){var w=box.clientWidth,h=box.clientHeight;r.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix();});
-    (function loop(){c.update();r.render(sc,cam);requestAnimationFrame(loop);})();
+    var v=new THREE.Vector3();
+    (function loop(){
+      lz+=((open?62:26.49)-lz)*.09;lid.position.z=lz;comps.visible=open||lz>40;
+      c.update();r.render(sc,cam);
+      var w=box.clientWidth,h=box.clientHeight,show=open&&lz>55;
+      items.forEach(function(it){
+        if(!show){it.el.style.opacity=0;return;}
+        if(it.fixed)v.set(it.dx,it.dy,it.top);else v.set(0,0,it.top);
+        it.m.localToWorld(v);v.project(cam);
+        it.el.style.opacity=1;it.el.style.transform='translate('+((v.x*.5+.5)*w)+'px,'+((-v.y*.5+.5)*h)+'px)';
+      });
+      requestAnimationFrame(loop);})();
   }catch(e){fail('Modèle 3D indisponible (connexion nécessaire). Fichier : assets/boitier-stl.js');console.error(e);}
 }
 new IntersectionObserver(function(es,o){if(es[0].isIntersecting){o.disconnect();start();}},{rootMargin:'300px'}).observe(box);
