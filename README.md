@@ -27,7 +27,7 @@ open index.html            # landing page (macOS ; sinon double-clic sur le fich
 open dashboard/index.html  # tableau de bord
 ```
 
-La landing charge la police DM Sans (Google Fonts) et la bibliothèque three.js (jsDelivr) pour afficher le boîtier en 3D : une connexion est nécessaire pour ces deux éléments. Le tableau de bord fonctionne hors ligne, avec Arial à la place de DM Sans si la police n'est pas disponible.
+La landing charge la police DM Sans (Google Fonts) et la bibliothèque three.js (jsDelivr) pour afficher le boîtier en 3D : une connexion est nécessaire pour ces deux éléments. Le tableau de bord charge aussi le fond de carte Esri World Street Map et Leaflet (cdnjs) ; hors ligne, il bascule sur une carte simplifiée sans fond.
 
 ## Ce qui est réel, ce qui est simulé
 

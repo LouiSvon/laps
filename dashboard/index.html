@@ -45,6 +45,7 @@ body{font:14px/1.45 var(--font);color:var(--text);background:var(--bg);display:f
 #sim{background:var(--sim);border-bottom:1px solid var(--line);border-left:6px solid var(--lime);padding:6px 24px;font-size:13px}
 #toolbar{background:#fff;border-bottom:1px solid var(--line);padding:10px 24px;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center}
 #toolbar label{color:var(--muted);font-size:12px}
+#toolbar select{max-width:230px}
 select,button,input{font:14px var(--font);border:1px solid var(--line);background:#fff;color:var(--text);padding:5px 8px}
 button{background:var(--accent);color:#fff;border-color:var(--accent);cursor:pointer;padding:5px 14px;font-weight:500}
 button:hover{background:#085c69}
@@ -87,7 +88,36 @@ dl.kv dt{color:var(--muted)} dl.kv dd{margin:0}
 #status{background:#fff;border-top:1px solid var(--line);padding:6px 24px;display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:12px}
 .heat td.h{text-align:center;padding:2px;min-width:28px;font:11px var(--mono)}
 .legend-line{stroke:var(--accent)}
-@media (max-width:800px){body{flex-direction:column;height:auto}#side{width:auto}#tabs{flex-direction:row;flex-wrap:wrap;padding:4px}#tabs button{border-left:0;border-bottom:4px solid transparent;padding:8px 10px}#tabs button[aria-selected="true"]{border-bottom-color:var(--lime)}#main{height:auto}#content{overflow:visible}}
+
+/* ergonomie */
+button:focus-visible,select:focus-visible,input:focus-visible,th:focus-visible,tr:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+button.ghost{background:#fff;color:var(--accent);border-color:var(--accent)}
+button.ghost:hover{background:#E6F2F4}
+button:disabled{opacity:.45;cursor:not-allowed}
+#tabs .grp{color:#8f9aa3;font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:14px 16px 4px}
+#tabs .grp:first-child{padding-top:4px}
+#tabs .bd{float:right;background:var(--bad);color:#fff;font:700 11px var(--mono);padding:1px 7px;border-radius:9px}
+#sim{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#sim a{color:var(--accent);font-weight:700;cursor:pointer;text-decoration:underline}
+.alertbar{background:#FBEAE8;border:1px solid #E6B8B3;border-left:6px solid var(--bad);padding:8px 12px;margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.alertbar span{flex:1 1 300px}
+#lmap{height:min(66vh,640px);min-height:380px;border:1px solid var(--line);background:#dfe5e9;z-index:0}
+.lp{border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px rgba(30,35,40,.35),0 1px 4px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font:700 11px var(--mono);cursor:pointer;transition:transform .12s}
+.lp:hover{transform:scale(1.15)}
+.lp.sel{box-shadow:0 0 0 3px var(--ink),0 0 0 6px rgba(143,191,31,.9);transform:scale(1.15)}
+.lp.off{opacity:.3}
+.sc{width:9px;height:9px;background:#5C6670;border:1px solid #fff}
+.leaflet-container{font-family:var(--font)}
+.mlist{max-height:44vh;overflow:auto;border:1px solid var(--line);background:#fff}
+.mlist button{display:flex;width:100%;gap:8px;align-items:center;background:#fff;color:var(--text);border:0;border-bottom:1px solid var(--line2);padding:7px 10px;text-align:left;font-weight:400}
+.mlist button:hover,.mlist button.sel{background:#CFE7EB}
+.mlist i{flex:none;width:12px;height:12px;border-radius:50%;display:inline-block}
+.mlist b{font-family:var(--mono);font-size:12px}
+.mlist em{margin-left:auto;font:12px var(--mono);color:var(--muted);font-style:normal}
+.mleg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:6px 0 0}
+.mleg i{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:4px}
+.mbar{display:flex;gap:10px 18px;flex-wrap:wrap;align-items:center;margin:0 0 8px}
+@media (max-width:800px){#lmap{height:56vh;min-height:320px}body{flex-direction:column;height:auto}#side{width:auto}#tabs{flex-direction:row;flex-wrap:wrap;padding:4px}#tabs button{border-left:0;border-bottom:4px solid transparent;padding:8px 10px}#tabs button[aria-selected="true"]{border-bottom-color:var(--lime)}#main{height:auto}#content{overflow:visible}}
 @media print{
   #side,#toolbar{display:none}
   body{display:block;background:#fff}#main{height:auto}
@@ -97,21 +127,23 @@ dl.kv dt{color:var(--muted)} dl.kv dd{margin:0}
 }
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </head>
 <body>
-<noscript>Ce tableau de bord nécessite JavaScript (aucune connexion réseau n'est utilisée).</noscript>
-<div id="side"><div id="brand"><svg viewBox="0 0 220 80"><rect x="10" y="12" width="9" height="56" fill="#fff"/><rect x="25" y="12" width="9" height="56" fill="#fff"/><rect x="40" y="12" width="9" height="56" fill="#fff"/><rect x="55" y="12" width="9" height="56" fill="#6FD3E3"/><rect x="70" y="12" width="9" height="56" fill="#8FBF1F"/><text x="94" y="54" font-size="34" font-weight="700" letter-spacing="3" fill="#fff" font-family="DM Sans,Arial,sans-serif">LAPS</text></svg><small>Collectivité</small></div><div id="tabs" role="tablist" aria-label="Feuilles"></div><div id="sidefoot">Hors ligne. Charte en version test.</div></div>
+<noscript>Ce tableau de bord nécessite JavaScript.</noscript>
+<div id="side"><div id="brand"><svg viewBox="0 0 220 80"><rect x="10" y="12" width="9" height="56" fill="#fff"/><rect x="25" y="12" width="9" height="56" fill="#fff"/><rect x="40" y="12" width="9" height="56" fill="#fff"/><rect x="55" y="12" width="9" height="56" fill="#6FD3E3"/><rect x="70" y="12" width="9" height="56" fill="#8FBF1F"/><text x="94" y="54" font-size="34" font-weight="700" letter-spacing="3" fill="#fff" font-family="DM Sans,Arial,sans-serif">LAPS</text></svg><small>Collectivité</small></div><div id="tabs" role="tablist" aria-label="Feuilles"></div><div id="sidefoot">Charte en version test. La carte demande une connexion.</div></div>
 <div id="main">
 <div id="titlebar"><span><b>Salon-de-Provence</b> &nbsp; Tableau de bord des passages piétons</span><span id="stamp"></span></div>
-<div id="sim">USAGE SIMULÉ : les carrefours, les rues et les écoles sont réels (OpenStreetMap, Éducation nationale), mais les demandes de temps supplémentaire, les largeurs et les incidents sont simulés. Voir la feuille Notes.</div>
+<div id="sim"><span><b>USAGE SIMULÉ.</b> Carrefours, rues et écoles réels. Demandes, largeurs et incidents simulés.</span><a id="goNotes" tabindex="0">Détails (Notes)</a></div>
 <div id="toolbar">
   <span><label for="fPeriod">Période :</label> <select id="fPeriod"><option value="7">7 derniers jours</option><option value="30" selected>30 derniers jours</option><option value="90">90 derniers jours</option></select></span>
   <span><label for="fType">Type de site :</label> <select id="fType"></select></span>
   <span><label for="fPass">Passage :</label> <select id="fPass"></select></span>
-  <span><button id="bCsv" type="button">Exporter en CSV</button> <button id="bPrint" type="button">Imprimer</button></span>
+  <span><button id="bReset" type="button" class="ghost" hidden>Réinitialiser les filtres</button> <button id="bCsv" type="button">Exporter en CSV</button> <button id="bPrint" type="button">Imprimer</button></span>
 </div>
 <div id="content" role="tabpanel" aria-live="polite"></div>
-<div id="status"><span id="sCount"></span><span id="sPeriod"></span><span>Hors ligne : aucune donnée n'est envoyée</span><span>DONNÉES SIMULÉES</span></div>
+<div id="status"><span id="sCount"></span><span id="sPeriod"></span><span>Aucune donnée saisie n'est envoyée</span><span>DONNÉES SIMULÉES</span></div>
 </div>
 
 <script>
@@ -302,7 +334,7 @@ function passageRowsAll(d0,d1){
 }
 
 /* ---------- État de l'interface ---------- */
-var S={sheet:'synthese',period:30,type:'Tous',pass:'Tous',sel:null,mapLayer:'state',simExt:''};
+var S={sheet:'synthese',period:30,type:'Tous',pass:'Tous',sel:null,mapLayer:'state',simExt:'',schools:true,mapView:null};
 var sorts={}, exportData={}, current=null;
 
 function idxs(){return P.filter(function(x){return (S.type==='Tous'||x.type===S.type)&&(S.pass==='Tous'||x.id===S.pass);}).map(function(x){return x.i;});}
@@ -408,11 +440,12 @@ function sheetSynthese(){
   var al=incidentsIn(ix,r[0],r[1]).filter(function(x){return x.ongoing;});
   var ah=al.length?al.map(function(x){return '<tr><td>'+P[x.p].id+'</td><td>'+P[x.p].site+'</td><td class="'+(x.kind==='Mode dégradé'?'st-warn':'st-bad')+'">'+x.kind+'</td><td>'+fmtDT(x.s)+'</td></tr>';}).join(''):'<tr><td colspan="4">Aucune alerte en cours</td></tr>';
   var cardIdx=[0,2,3,4,7,8,9],cardCls=['','a','l','a','','l',''],cards='<div class="kpis">'+cardIdx.map(function(q,n){var x=krows[q];return '<div class="kpi '+cardCls[n]+'"><div class="t">'+x.k+'</div><div class="v">'+x.cur+'</div><div class="d">Précédente : '+x.prev+' '+x.var+'</div></div>';}).join('')+'</div>';
-  return cards+'<div class="cols"><div class="block"><h2>Tous les indicateurs</h2>'+kt+
+  var bar=al.length?'<div class="alertbar"><span><b>'+al.length+' passage(s) hors service :</b> '+al.map(function(x){return P[x.p].id+' ('+x.kind.toLowerCase()+')';}).join(', ')+'.</span><button type="button" data-go="alertes">Voir les alertes</button> <button type="button" class="ghost" data-go="carte">Voir sur la carte</button></div>':'';
+  return bar+cards+'<div class="cols"><div class="block"><h2>Tous les indicateurs</h2>'+kt+
     '<p class="note">Période : '+fmtDate(r[0])+' au '+fmtDate(r[1]-1)+(pr?'. Comparée aux '+S.period+' jours précédents.':'. Pas de période précédente disponible.')+'</p></div>'+
     '<div class="block"><h2>Demandes par jour</h2>'+barChart(c.byDay,labels,{short:short,line:movAvg(c.byDay,7),lineLabel:'moyenne sur 7 jours',unit:'demandes',alt:'Demandes par jour'})+'</div></div>'+
-    '<div class="cols"><div class="block"><h2>Passages à traiter en priorité (indice de priorité d\'aménagement)</h2>'+tableHTML('top',tcols,top,{noscroll:1,nosort:1})+
-    '<p class="note">Indice défini dans la feuille Notes. Détail et tri dans la feuille Passages.</p></div>'+
+    '<div class="cols"><div class="block"><h2>Passages à traiter en priorité (indice de priorité d\'aménagement)</h2>'+tableHTML('top',tcols,top,{noscroll:1,nosort:1,rowId:'id'})+
+    '<p class="note">Cliquer sur une ligne pour la voir sur la carte. Indice défini dans la feuille Notes.</p></div>'+
     '<div class="block"><h2>Alertes en cours</h2><table class="grid"><thead><tr><th>Passage</th><th>Site</th><th>État</th><th>Depuis</th></tr></thead><tbody>'+ah+'</tbody></table></div></div>';
 }
 var PCOLS=[
@@ -507,7 +540,7 @@ function sheetNotes(){
   '<p><b>Secondes ajoutées.</b> Nombre de demandes multiplié par l\'extension réglée du passage. C\'est un maximum : le feu peut se terminer plus tôt si la personne a fini de traverser (non simulé).</p>'+
   '<p><b>Disponibilité.</b> 100 % moins la part des heures en incident (hors ligne ou mode dégradé), sur la période et les passages filtrés.</p>'+
   '<p><b>Indice de priorité d\'aménagement.</b> 70 % : demandes par jour du passage rapportées au maximum des 18 passages ; 30 % : largeur de chaussée rapportée à la plus grande. Pondérations arbitraires, à discuter. Il sert à repérer où investir (bancs, abaissement de trottoir, îlot refuge), pas à classer officiellement.</p>'+
-  '<p><b>Carte.</b> Projection des coordonnées réelles, sans fond de carte (la page fonctionne hors ligne). Les 18 carrefours sont un minimum : OpenStreetMap peut être incomplet. Largeur de chaussée et durée de vert sont simulées en attendant un relevé.</p>'+
+  '<p><b>Carte.</b> Fond de carte Esri World Street Map (Leaflet), chargé depuis Internet : le navigateur envoie alors son adresse IP aux serveurs de tuiles Esri (World Street Map). Hors ligne, la page bascule sur une projection simple des mêmes positions, sans fond. Les 18 carrefours sont un minimum : OpenStreetMap peut être incomplet. Largeur de chaussée et durée de vert sont simulées en attendant un relevé.</p>'+
   '<p><b>Couverture (feuille Réglages).</b> Part des usagers cibles dont le temps de traversée tient dans (vert + extension). Hypothèse : vitesses de marche en loi normale, moyenne 0,8 m/s (étude de presse citée dans le doc d\'équipe, 0,8 à 0,9 m/s pour les plus de 65 ans), écart-type 0,2 m/s (arbitraire). Avec ces valeurs, une extension calculée à 0,6 m/s couvre environ 84 % des usagers cibles ; le plafond de '+PLAFOND+' s et la borne basse font baisser la moyenne des passages larges (environ 77 % dans cette simulation). Sans Laps, la couverture tombe à près de 0 % sur ces chaussées : c\'est une conséquence des hypothèses, pas une mesure. À remplacer par une distribution mesurée ou sourcée.</p>'+
   '<p><b>Rouge véhicule en pointe.</b> Demandes des heures de pointe multipliées par l\'extension : borne haute de l\'impact sur la circulation, sans modèle de carrefour ni coordination avec les feux voisins.</p>'+
   '<p><b>Vie privée.</b> Le dashboard ne contient aucune donnée nominative ni identifiant de carte. Seuls des comptages agrégés par passage, jour et heure sont affichés (principe du doc d\'équipe : jeton anonyme, aucun historique individuel).</p>'+
@@ -522,8 +555,8 @@ MAP.h=Math.round((MAP.lat1-MAP.lat0)*MAP.ky+2*MAP.pad);
 function mx(lon){return MAP.pad+(lon-MAP.lon0)*MAP.k;}
 function my(lat){return MAP.pad+(MAP.lat1-lat)*MAP.ky;}
 function scale(v,max){return max?Math.max(0,Math.min(1,v/max)):0;}
-function sheetCarte(){
-  var ix=idxs(),r=range(),all=passageRowsAll(r[0],r[1]),maxPd=0,maxSc=0;
+function sheetCarteSvg(ix,all,maxPd,maxSc){
+  var r=range();
   all.forEach(function(x){if(x.perDay>maxPd)maxPd=x.perDay;if(x.score>maxSc)maxSc=x.score;});
   var sv='<svg viewBox="0 0 '+MAP.w+' '+MAP.h+'" role="img" aria-label="Carte des carrefours à feux de Salon-de-Provence">';
   sv+='<rect x="1" y="1" width="'+(MAP.w-2)+'" height="'+(MAP.h-2)+'" fill="#F7F9FA" stroke="#C9D0D6"/>';
@@ -543,20 +576,80 @@ function sheetCarte(){
     if(on)sv+='<text x="'+(cx+rad+2).toFixed(1)+'" y="'+(cy-rad-1).toFixed(1)+'" pointer-events="none">'+x.id+'</text>';
   });
   sv+='</svg>';
-  var sel=all.filter(function(x){return x.id===S.sel;})[0],panel;
-  if(sel){
-    var pr=P[sel.i];
-    panel='<dl class="kv"><dt>Passage</dt><dd>'+sel.id+' - '+sel.site+'</dd><dt>Zone</dt><dd>'+sel.sector+'</dd><dt>Type de lieu</dt><dd>'+pr.type+'</dd><dt>État</dt><dd class="'+stCls(sel.state)+'">'+sel.state+'</dd>'+
-      '<dt>Demandes par jour</dt><dd>'+f1(sel.perDay)+'</dd><dt>Disponibilité</dt><dd>'+f1(sel.avail)+' %</dd><dt>Largeur / vert / extension</dt><dd>'+pr.width+' m / '+pr.green+' s / '+pr.ext+' s</dd>'+
-      '<dt>Priorité</dt><dd>'+sel.score+' sur 100</dd></dl><p><button type="button" id="goDetail">Voir le détail</button></p>';
-  } else panel='<p>Cliquer sur un passage de la carte pour voir ses indicateurs.</p>';
-  var leg=S.mapLayer==='state'?'Couleur : vert en service, orange mode dégradé, rouge hors ligne.':'Couleur : plus le point est foncé, plus la valeur est forte.';
-  return '<div class="cols"><div class="block" style="flex:2 1 520px"><h2>Carte des carrefours à feux de Salon-de-Provence</h2>'+
-    '<div style="border:1px solid var(--line);padding:4px;background:#fff"><p style="margin:0 0 4px"><label for="mapLayer">Colorier selon :</label> <select id="mapLayer">'+
-    '<option value="state"'+(S.mapLayer==='state'?' selected':'')+'>État du boîtier</option><option value="vol"'+(S.mapLayer==='vol'?' selected':'')+'>Volume de demandes</option><option value="score"'+(S.mapLayer==='score'?' selected':'')+'>Indice de priorité</option></select></p>'+
-    '<div class="chart" style="border:0;padding:0">'+sv+'</div></div>'+
-    '<p class="note">Taille du point : demandes par jour. '+leg+' Passages hors filtres : estompés. Carrés gris : établissements scolaires (position réelle). Les établissements pour personnes âgées ne sont pas placés : leurs coordonnées manquent.</p></div>'+
-    '<div class="block" style="flex:1 1 260px"><h2>Passage sélectionné</h2><div style="border:1px solid var(--line);padding:6px 8px;background:#fff">'+panel+'</div></div></div>';
+  return sv;
+}
+/* ---------- Carte OpenStreetMap (Leaflet) avec les capteurs Laps ---------- */
+var MD=null,LM=null,MK={};
+function ramp(t){var a=[207,231,235],b=[10,118,134];return 'rgb('+a.map(function(v,i){return Math.round(v+(b[i]-v)*t);}).join(',')+')';}
+function stColor(st){return st==='En service'?'#1B7A43':(st==='Mode dégradé'?'#C98A00':'#B3261E');}
+function pinColors(x){
+  if(S.mapLayer==='state')return {bg:stColor(x.state),fg:x.state==='Mode dégradé'?'#1E2328':'#fff'};
+  var t=scale(S.mapLayer==='score'?x.score:x.perDay,S.mapLayer==='score'?MD.maxSc:MD.maxPd);
+  return {bg:ramp(0.15+0.85*t),fg:t<0.45?'#1E2328':'#fff'};
+}
+function pinIcon(x){
+  var on=MD.ix.indexOf(x.i)>=0,c=pinColors(x),sz=22+Math.round(10*scale(x.perDay,MD.maxPd));
+  return L.divIcon({className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],
+    html:'<div class="lp'+(S.sel===x.id?' sel':'')+(on?'':' off')+'" style="width:'+sz+'px;height:'+sz+'px;background:'+c.bg+';color:'+c.fg+'">'+(+x.id.slice(1))+'</div>'});
+}
+function mapPanelHTML(){
+  var sel=MD.all.filter(function(x){return x.id===S.sel;})[0];
+  if(!sel)return '<p>Cliquer sur un capteur de la carte ou de la liste pour voir ses indicateurs.</p>';
+  var pr=P[sel.i];
+  return '<dl class="kv"><dt>Capteur</dt><dd><b>'+sel.id+'</b> - '+sel.site+'</dd><dt>Zone</dt><dd>'+sel.sector+'</dd><dt>Type de lieu</dt><dd>'+pr.type+'</dd><dt>État</dt><dd class="'+stCls(sel.state)+'">'+sel.state+'</dd>'+
+    '<dt>Demandes par jour</dt><dd>'+f1(sel.perDay)+'</dd><dt>Disponibilité</dt><dd>'+f1(sel.avail)+' %</dd><dt>Largeur / vert / extension</dt><dd>'+pr.width+' m / '+pr.green+' s / '+pr.ext+' s</dd>'+
+    '<dt>Priorité</dt><dd>'+sel.score+' sur 100</dd><dt>Écoles à moins de 300 m</dt><dd>'+(pr.near.length?pr.near.length:'aucune')+'</dd></dl><p><button type="button" id="goDetail">Voir le détail</button></p>';
+}
+function mapListHTML(){
+  var rows=MD.all.filter(function(x){return MD.ix.indexOf(x.i)>=0;}).sort(function(a,b){return b.perDay-a.perDay;});
+  return rows.map(function(x){
+    return '<button type="button" data-mp="'+x.id+'"'+(S.sel===x.id?' class="sel"':'')+'><i style="background:'+stColor(x.state)+'"></i><b>'+x.id+'</b> '+x.site+'<em>'+f1(x.perDay)+'/j</em></button>';
+  }).join('')||'<p style="padding:8px">Aucun capteur avec ces filtres.</p>';
+}
+function mapSelect(id,fly){
+  S.sel=id;
+  MD.all.forEach(function(x){if(MK[x.id])MK[x.id].setIcon(pinIcon(x));});
+  var pn=$('mapPanel'),ls=$('mapList');
+  if(pn)pn.innerHTML=mapPanelHTML();
+  if(ls){ls.innerHTML=mapListHTML();var b=ls.querySelector('button.sel');if(b)b.scrollIntoView({block:'nearest'});}
+  if(fly&&LM&&MK[id])LM.panTo(MK[id].getLatLng());
+}
+function initMap(){
+  if(LM){LM.remove();LM=null;}
+  MK={};
+  var el=$('lmap');if(!el||!window.L)return;
+  LM=L.map(el,{scrollWheelZoom:true});
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Fond © Esri, HERE, Garmin, OpenStreetMap contributors'}).addTo(LM);
+  L.control.scale({metric:true,imperial:false}).addTo(LM);
+  var pts=[];
+  if(S.schools)ECOLES.forEach(function(e){
+    L.marker([e[2],e[3]],{icon:L.divIcon({className:'',iconSize:[9,9],iconAnchor:[4,4],html:'<div class="sc"></div>'}),keyboard:false,zIndexOffset:-1000}).bindTooltip(e[0]).addTo(LM);
+  });
+  MD.all.forEach(function(x){
+    var pr=P[x.i],m=L.marker([pr.lat,pr.lon],{icon:pinIcon(x),title:x.id+' - '+x.site,riseOnHover:true}).addTo(LM);
+    m.bindTooltip('<b>'+x.id+'</b> '+x.site+'<br>'+f1(x.perDay)+' demandes/jour, '+x.state);
+    m.on('click',function(){mapSelect(x.id,false);});
+    MK[x.id]=m;pts.push([pr.lat,pr.lon]);
+  });
+  if(S.mapView)LM.setView(S.mapView.c,S.mapView.z);
+  else LM.setView([43.6370,5.0945],14);
+  LM.on('moveend',function(){var c=LM.getCenter();S.mapView={c:[c.lat,c.lng],z:LM.getZoom()};});
+}
+function sheetCarte(){
+  var ix=idxs(),r=range(),all=passageRowsAll(r[0],r[1]),maxPd=0,maxSc=0;
+  all.forEach(function(x){if(x.perDay>maxPd)maxPd=x.perDay;if(x.score>maxSc)maxSc=x.score;});
+  MD={all:all,ix:ix,maxPd:maxPd,maxSc:maxSc};
+  var opts='<option value="state"'+(S.mapLayer==='state'?' selected':'')+'>État du capteur</option><option value="vol"'+(S.mapLayer==='vol'?' selected':'')+'>Volume de demandes</option><option value="score"'+(S.mapLayer==='score'?' selected':'')+'>Indice de priorité</option>';
+  var bar='<div class="mbar"><span><label for="mapLayer">Colorier selon :</label> <select id="mapLayer">'+opts+'</select></span>'+
+    '<label><input type="checkbox" id="mapSchools"'+(S.schools?' checked':'')+'> Afficher les écoles</label></div>';
+  var leg=S.mapLayer==='state'?'<span><i style="background:#1B7A43"></i>En service</span><span><i style="background:#C98A00"></i>Mode dégradé</span><span><i style="background:#B3261E"></i>Hors ligne</span>':'<span><i style="background:'+ramp(.15)+';border:1px solid var(--line)"></i>faible</span><span><i style="background:'+ramp(1)+'"></i>fort</span>';
+  var legend='<div class="mleg">'+leg+'<span>Taille : demandes par jour</span>'+(S.schools?'<span><span class="sc" style="display:inline-block"></span> école</span>':'')+'</div>';
+  var mapBox=window.L?'<div id="lmap" role="application" aria-label="Carte de Salon-de-Provence avec les capteurs Laps"></div>':
+    '<div class="chart" style="padding:0">'+sheetCarteSvg(ix,all,maxPd,maxSc)+'</div><p class="note st-warn">Fond de carte indisponible (hors ligne) : projection simple des positions réelles.</p>';
+  return '<div class="cols"><div class="block" style="flex:2 1 560px"><h2>Capteurs Laps à Salon-de-Provence</h2>'+bar+mapBox+legend+
+    '<p class="note">Positions réelles des 18 carrefours à feux (OpenStreetMap, minimum : la couverture peut être incomplète). Un capteur par carrefour est une hypothèse de simulation, aucun boîtier n\'est installé. Passages hors filtres : estompés.</p></div>'+
+    '<div class="block" style="flex:1 1 280px"><h2>Capteur sélectionné</h2><div id="mapPanel" style="border:1px solid var(--line);padding:8px 10px;background:#fff;margin-bottom:14px">'+mapPanelHTML()+'</div>'+
+    '<h2>Tous les capteurs</h2><div id="mapList" class="mlist">'+mapListHTML()+'</div></div></div>';
 }
 function simData(){
   var ix=idxs(),r=range(),e=(S.simExt===''||isNaN(+S.simExt))?null:Math.max(0,Math.min(40,+S.simExt));
@@ -617,14 +710,23 @@ var SHEETS=[
 ];
 
 /* ---------- Rendu ---------- */
+var GROUPS=[['Pilotage',['synthese','carte','alertes']],['Analyse',['passages','chrono','heures','reglages']],['Documents',['donnees','rapport','notes']]];
 var $=function(id){return document.getElementById(id);};
 function render(){
   var sh=SHEETS.filter(function(x){return x.id===S.sheet;})[0]||SHEETS[0];
   $('content').innerHTML=sh.fn();
   current=sh;
-  var tabs='';
-  SHEETS.forEach(function(x){tabs+='<button type="button" role="tab" data-sheet="'+x.id+'" aria-selected="'+(x.id===S.sheet)+'">'+x.label+'</button>';});
+  var tabs='',nAl=idxs().filter(function(q){return stateOf(q)!=='En service';}).length;
+  GROUPS.forEach(function(g){
+    tabs+='<div class="grp" role="presentation">'+g[0]+'</div>';
+    g[1].forEach(function(id){
+      var x=SHEETS.filter(function(y){return y.id===id;})[0];
+      tabs+='<button type="button" role="tab" data-sheet="'+x.id+'" aria-selected="'+(x.id===S.sheet)+'">'+x.label+(x.id==='alertes'&&nAl?'<span class="bd" title="'+nAl+' passage(s) hors service">'+nAl+'</span>':'')+'</button>';
+    });
+  });
   $('tabs').innerHTML=tabs;
+  $('bReset').hidden=(S.period===30&&S.type==='Tous'&&S.pass==='Tous');
+  if(S.sheet==='carte')initMap();
   var r=range();
   $('sCount').textContent=idxs().length+' passage(s) sélectionné(s) sur '+NP;
   $('sPeriod').textContent='Période : '+fmtDate(r[0])+' au '+fmtDate(r[1]-1);
@@ -660,6 +762,10 @@ $('fType').addEventListener('change',function(){S.type=this.value;fillPass();ren
 $('fPass').addEventListener('change',function(){S.pass=this.value;render();});
 $('bPrint').addEventListener('click',function(){window.print();});
 $('bCsv').addEventListener('click',download);
+$('bReset').addEventListener('click',function(){S.period=30;S.type='Tous';S.pass='Tous';$('fPeriod').value='30';$('fType').value='Tous';fillPass();render();});
+$('goNotes').addEventListener('click',function(){S.sheet='notes';location.hash='notes';render();});
+$('goNotes').addEventListener('keydown',function(e){if(e.key==='Enter'){S.sheet='notes';location.hash='notes';render();}});
+window.addEventListener('hashchange',function(){var h=location.hash.replace('#','');if(h!==S.sheet&&SHEETS.some(function(x){return x.id===h;})){S.sheet=h;render();}});
 $('tabs').addEventListener('click',function(e){var b=e.target.closest('button[data-sheet]');if(b){S.sheet=b.getAttribute('data-sheet');location.hash=S.sheet;render();}});
 function sortClick(th){
   var id=th.getAttribute('data-t'),k=th.getAttribute('data-k'),s=sorts[id];
@@ -668,15 +774,17 @@ function sortClick(th){
 }
 $('content').addEventListener('click',function(e){
   var th=e.target.closest('th[data-t]');if(th){sortClick(th);return;}
-  var tr=e.target.closest('tr[data-id]');if(tr){S.sel=tr.getAttribute('data-id');render();var f=$('content').querySelector('fieldset');if(f)f.scrollIntoView({block:'nearest'});}
+  var tr=e.target.closest('tr[data-id]');if(tr){S.sel=tr.getAttribute('data-id');if(S.sheet==='synthese'){S.sheet='carte';S.mapView=null;location.hash='carte';render();return;}render();var f=$('content').querySelector('fieldset');if(f)f.scrollIntoView({block:'nearest'});}
 });
 $('content').addEventListener('keydown',function(e){
   if(e.key!=='Enter'&&e.key!==' ')return;
   var th=e.target.closest('th[data-t]');if(th){e.preventDefault();sortClick(th);return;}
-  var tr=e.target.closest('tr[data-id]');if(tr){e.preventDefault();S.sel=tr.getAttribute('data-id');render();}
+  var tr=e.target.closest('tr[data-id]');if(tr){e.preventDefault();S.sel=tr.getAttribute('data-id');if(S.sheet==='synthese'){S.sheet='carte';S.mapView=null;location.hash='carte';}render();}
 });
 function pickPass(id){S.sel=id;render();}
 $('content').addEventListener('click',function(e){
+  var mp=e.target.closest('[data-mp]');if(mp){mapSelect(mp.getAttribute('data-mp'),true);return;}
+  var go=e.target.closest('[data-go]');if(go){S.sheet=go.getAttribute('data-go');location.hash=S.sheet;render();return;}
   var c=e.target.closest('[data-pid]');if(c){pickPass(c.getAttribute('data-pid'));return;}
   if(e.target.id==='goDetail'){S.sheet='passages';location.hash='passages';render();return;}
   if(e.target.id==='simReset'){S.simExt='';render();}
@@ -685,7 +793,7 @@ $('content').addEventListener('keydown',function(e){
   if(e.key!=='Enter'&&e.key!==' ')return;
   var c=e.target.closest('[data-pid]');if(c){e.preventDefault();pickPass(c.getAttribute('data-pid'));}
 });
-$('content').addEventListener('change',function(e){if(e.target.id==='mapLayer'){S.mapLayer=e.target.value;render();}});
+$('content').addEventListener('change',function(e){if(e.target.id==='mapLayer'){S.mapLayer=e.target.value;render();}if(e.target.id==='mapSchools'){S.schools=e.target.checked;render();}});
 $('content').addEventListener('input',function(e){if(e.target.id==='simExt'){S.simExt=e.target.value;$('simOut').innerHTML=simOut();}});
 var h0=location.hash.replace('#','');
 if(SHEETS.some(function(x){return x.id===h0;}))S.sheet=h0;
