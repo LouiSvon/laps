@@ -163,12 +163,34 @@ details{border-bottom:1px solid var(--line);padding:14px 0;max-width:760px}summa
 footer{background:var(--ink);color:#c8d0d6;padding:40px 0;font-size:14px}
 footer ol{columns:2;gap:36px;padding-left:18px}footer a{color:var(--cyan2)}footer .fl{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
 @media (max-width:860px){.hero .grid,.proof,.two,.big{grid-template-columns:1fr}.steps{grid-template-columns:1fr;gap:28px}.salon{grid-template-columns:1fr 1fr}#dots{display:none}section{padding:64px 0;min-height:0}.hero{min-height:0}footer ol{columns:1}.hero .grid>*,.proof>*,.two>*{min-width:0}.hero .btn{display:block;text-align:center}}
+
+/* budget */
+.dark .seg button{background:transparent;color:#fff;border-color:#fff}.dark .seg button[aria-pressed=true]{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+.bomrow{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:34px;align-items:start}
+#bomBar{display:flex;height:64px;gap:3px;margin:16px 0 8px}
+#bomBar i{display:block;height:100%;min-width:4px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+#bomList{list-style:none;padding:0;margin:14px 0 0}
+#bomList li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #39424a;font-size:17px}
+#bomList li i{width:14px;height:14px;flex:none}#bomList li b{margin-left:auto;font:500 17px var(--mono)}
+.tot{font:500 clamp(54px,9vw,96px)/1 var(--mono);color:var(--lime);margin:8px 0 0}
+.tot small{font-size:.32em;color:#fff;letter-spacing:0}
+.lbl{font-size:16px;color:#c8d0d6;margin:0}
+.calc2{border:2px solid #39424a;padding:22px}
+.calc2 label{display:block;font-weight:700;margin-bottom:6px}
+.calc2 input[type=range]{width:100%;accent-color:var(--lime);margin:6px 0 16px}
+.calc2 .res2{font:500 clamp(28px,4vw,40px)/1.1 var(--mono);color:#fff}
+.chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:34px}
+.chips div{border-top:6px solid var(--cyan2);background:#2a3138;padding:14px 16px}
+.chips b{display:block;font:500 24px var(--mono);color:#fff;margin-bottom:4px}
+.chips span{font-size:15px;color:#c8d0d6}
+.fine{font-size:14px;color:#9aa6af;margin-top:22px;max-width:820px}
+@media (max-width:860px){.bomrow{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.hero .walker,.b2{animation:none}.hero .walker{left:50%}html{scroll-behavior:auto}.cmp i,.pct i,.range i{transition:none}}
 </style></head><body>
 <div id="prog"></div>
 <header class="top"><div class="wrap"><a href="#top" aria-label="LAPS, haut de page"><svg style="height:34px;width:auto;display:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 282 80" role="img" aria-label="LAPS"><title>LAPS</title><rect x="10" y="12" width="9" height="56" fill="#1E2328"/><rect x="25" y="12" width="9" height="56" fill="#1E2328"/><rect x="40" y="12" width="9" height="56" fill="#1E2328"/><rect x="55" y="12" width="9" height="56" fill="#0A7686"/><rect x="70" y="12" width="9" height="56" fill="#8FBF1F"/><path transform="translate(104 0)" fill="#1E2328" d="M0 12H9V59H30V68H0Z"/><path transform="translate(140 0)" fill="#1E2328" fill-rule="evenodd" d="M0 68L18 12H26L44 68H34.5L30 54H14L9.5 68Z M16.9 45H27.1L22 29.1Z"/><path transform="translate(190 0)" fill="#1E2328" fill-rule="evenodd" d="M0 12H31L38 19V37L31 44H9V68H0Z M9 20V36H28L29 35V21L28 20Z"/><path transform="translate(234 0)" fill="none" stroke="#1E2328" stroke-width="9" stroke-linejoin="miter" stroke-miterlimit="4" d="M33.5 26V21L29 16.5H9L4.5 21V31L13 40H29L33.5 44.5V59L29 63.5H9L4.5 59V54"/></svg>
 </a><a class="btn sm" href="#probleme">Essayer</a></div></header>
-<nav id="dots" aria-label="Étapes de la page"><a href="#top"><span>01 Accueil</span></a><a href="#probleme"><span>02 Le problème</span></a><a href="#chiffres"><span>03 Les chiffres</span></a><a href="#solution"><span>04 La solution</span></a><a href="#boitier"><span>05 Le boîtier</span></a><a href="#preuve"><span>06 La preuve</span></a><a href="#collectivite"><span>07 Pour vous</span></a><a href="#salon"><span>08 Salon</span></a><a href="#agir"><span>09 Agir</span></a></nav>
+<nav id="dots" aria-label="Étapes de la page"><a href="#top"><span>01 Accueil</span></a><a href="#probleme"><span>02 Le problème</span></a><a href="#chiffres"><span>03 Les chiffres</span></a><a href="#solution"><span>04 La solution</span></a><a href="#boitier"><span>05 Le boîtier</span></a><a href="#budget"><span>06 Le budget</span></a><a href="#preuve"><span>07 La preuve</span></a><a href="#collectivite"><span>08 Pour vous</span></a><a href="#salon"><span>09 Salon</span></a><a href="#agir"><span>10 Agir</span></a></nav>
 
 <main>
 <section class="dark hero" id="top"><div class="wrap grid"><div>
@@ -224,24 +246,41 @@ footer ol{columns:2;gap:36px;padding-left:18px}footer a{color:var(--cyan2)}foote
 <p class="tag rv"><b>05</b>LE BOÎTIER</p>
 <h2 class="rv d1">Voici le prototype.</h2>
 <p class="lead rv d2">Modèle 3D. Faites-le tourner.</p></div>
-<div class="rv d1"><div id="v3d" aria-label="Modèle 3D du boîtier Laps, à faire tourner à la souris ou au doigt"><p>Chargement du modèle 3D...</p></div><p class="hint">Glisser pour tourner. Nécessite une connexion.</p></div></div></section>
+<div class="rv d1"><div id="v3d" aria-label="Modèle 3D du boîtier Laps, à faire tourner à la souris ou au doigt"><p>Chargement du modèle 3D...</p></div><p class="hint">Glisser pour tourner. Nécessite une connexion.</p><div class="pills" style="margin-top:16px"><span>Microcontrôleur ESP32</span><span>Lecteur NFC</span><span>Module NB-IoT / LTE-M</span><span>Relais vers « demande piéton »</span><span>Boîtier IP67 / IK10</span></div></div></div></section>
+
+<section id="budget" class="dark"><div class="wrap">
+<p class="tag rv"><b>06</b>LE BUDGET</p>
+<h2 class="rv d1">Combien coûte un boîtier ?</h2>
+<p class="lead rv d2">Estimation de l'équipe, par carrefour.</p>
+<div class="seg rv d2" role="group" aria-label="Niveau de gamme" style="margin-top:26px"><button type="button" data-m="proto" aria-pressed="true">Prototype</button><button type="button" data-m="indus" aria-pressed="false">Industriel</button></div>
+<div class="bomrow"><div class="rv"><p class="lbl">Composants par boîtier, hors pose</p><div class="tot" id="bomTot">0 <small>€</small></div>
+<div id="bomBar" aria-hidden="true"></div><ul id="bomList"></ul></div>
+<div class="calc2 rv d1"><label for="nc">Carrefours équipés : <span id="ncv">18</span></label><input id="nc" type="range" min="1" max="30" step="1" value="18">
+<p class="lbl">Composants et pose (200 à 400 € par carrefour) :</p><div class="res2" id="bomRes">0</div>
+<p class="lbl" style="margin-top:12px">18 : carrefours à feux repérés à Salon-de-Provence. 30 : taille de la première série.</p></div></div>
+<div class="chips rv"><div><b>3 à 8 k€</b><span>marquage CE en laboratoire (jusqu'à 20 k€ si la radio est complexe)</span></div>
+<div><b>1 à 3 k€</b><span>dossier technique, plus l'achat des normes</span></div>
+<div><b>1,5 à 4 k€</b><span>tests d'usage avec les habitants</span></div>
+<div><b>jusqu'à 100 k€</b><span>moules du boîtier sur mesure, selon les volumes</span></div></div>
+<p class="fine">Coûts de revient estimés par l'équipe, sans devis ni fournisseur cité : ce n'est pas un prix de vente, qui n'est pas fixé. Les chiffres du bas de gamme viennent des composants de prototypage, ceux du haut de gamme des modules industriels étanches. Source 10.</p>
+</div></section>
 
 <section id="preuve"><div class="wrap proof"><div>
-<p class="tag rv"><b>06</b>LA PREUVE</p>
+<p class="tag rv"><b>07</b>LA PREUVE</p>
 <h2 class="rv d1">Ça marche déjà à Singapour.</h2>
 <p class="lead rv d2">Programme Green Man+ de l'agence LTA.</p></div>
 <div class="rv d1"><div class="num" data-count="1000" data-suf="+">0</div><p style="font-size:22px;margin:6px 0 0">passages équipés. <a href="#s5" style="font-size:14px">LTA</a></p>
 <div class="range" data-bars><i data-w="100">+3 à +13 s, selon la largeur</i></div></div></div></section>
 
 <section id="collectivite" class="alt"><div class="wrap two"><div>
-<p class="tag rv"><b>07</b>POUR LA COLLECTIVITÉ</p>
+<p class="tag rv"><b>08</b>POUR LA COLLECTIVITÉ</p>
 <h2 class="rv d1">Voyez où l'on a besoin de temps.</h2>
 <ul class="ticks rv d2"><li>Carte des passages</li><li>Priorités d'aménagement</li><li>Rapport en un clic</li></ul>
 <a class="btn rv d2" href="#salon">Voir notre terrain</a></div>
 <figure class="shot rv d1"><img src="img/dashboard.png" alt="Aperçu du tableau de bord Laps" loading="lazy"><figcaption>Tableau de bord. Données d'usage simulées.</figcaption></figure></div></section>
 
 <section id="salon" class="dark"><div class="wrap">
-<p class="tag rv"><b>08</b>NOTRE TERRAIN</p>
+<p class="tag rv"><b>09</b>NOTRE TERRAIN</p>
 <h2 class="rv d1">Salon-de-Provence, toute la ville.</h2>
 <div class="salon">
 <div class="rv"><b data-count="9042">0</b><span>habitants de 65 ans et +, soit 20,5 % <a href="#s6" style="color:#6FD3E3">INSEE</a></span></div>
@@ -251,10 +290,10 @@ footer ol{columns:2;gap:36px;padding-left:18px}footer a{color:var(--cyan2)}foote
 </div></section>
 
 <section id="agir" class="cta-final"><div class="wrap">
-<p class="tag rv" style="color:#cfeaf0"><b style="background:#fff;color:var(--ink)">09</b>AGIR</p>
+<p class="tag rv" style="color:#cfeaf0"><b style="background:#fff;color:var(--ink)">10</b>AGIR</p>
 <h2 class="rv d1">Équipons les premiers passages.</h2>
 <p class="lead rv d2">Du prototype au pilote en ville.</p>
-<div class="road rv d2"><div><b>Prototype</b><span>essais avec le gestionnaire</span></div><div><b>Industrialisation</b><span>marquage CE, boîtier scellé</span></div><div><b>Pilote en ville</b><span>hôpitaux, résidences, marchés</span></div></div>
+<div class="road rv d2"><div><b>Prototype</b><span>essais avec le gestionnaire</span></div><div><b>Industrialisation</b><span>marquage CE, boîtier scellé</span></div><div><b>Pilote en ville</b><span>30 premiers boîtiers : hôpitaux, résidences, marchés</span></div></div>
 <a class="btn rv d3" href="#probleme">Rejouer la traversée</a></div></section>
 
 <section style="min-height:0;padding:56px 0"><div class="wrap"><p class="tag"><b>?</b>QUESTIONS</p>
@@ -275,6 +314,7 @@ footer ol{columns:2;gap:36px;padding-left:18px}footer a{color:var(--cyan2)}foote
 <li id="s6"><a href="https://www.insee.fr/fr/statistiques/2011101?geo=COM-13103">INSEE, Salon-de-Provence, 2023</a></li>
 <li id="s7"><a href="https://www.conseildependance.fr/maison-retraite/bouches-du-rhone-13/salon-de-provence/">Conseil Dépendance, Salon-de-Provence</a></li>
 <li id="s8"><a href="https://www.openstreetmap.org/">OpenStreetMap (ODbL), 12/11/2026, regroupement par l'équipe</a></li>
+<li id="s10"><a href="https://github.com/LouiSvon/laps/blob/main/data/estimation-couts.md">Note de coûts de l'équipe LAPS (estimations, sans devis)</a></li>
 <li id="s9"><a href="https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/">Annuaire de l'éducation</a></li></ol></div></footer>
 
 <script>
@@ -376,8 +416,8 @@ function reset(){cancelAnimationFrame(raf);raf=null;stage.classList.remove('shak
   $('#go').textContent='Traverser';}
 function mark(k){done[k]=true;var n=0;document.querySelectorAll('#score span[data-k]').forEach(function(s){if(done[s.dataset.k]){s.classList.add('ok');n++;}});
   $('#scoretxt').textContent=n===3?'Les trois traversent. Voilà ce que fait Laps.':n+' sur 3 sauvés.';if(n===3)$('#next').hidden=false;}
-function pickProf(b){document.querySelectorAll('.seg button').forEach(function(x){x.setAttribute('aria-pressed','false');});b.setAttribute('aria-pressed','true');cur=b.dataset.p;reset();}
-document.querySelectorAll('.seg button').forEach(function(b){b.addEventListener('click',function(){pickProf(b);});});
+function pickProf(b){document.querySelectorAll('#game .seg button').forEach(function(x){x.setAttribute('aria-pressed','false');});b.setAttribute('aria-pressed','true');cur=b.dataset.p;reset();}
+document.querySelectorAll('#game .seg button').forEach(function(b){b.addEventListener('click',function(){pickProf(b);});});
 $('#laps').addEventListener('change',reset);
 $('#go').addEventListener('click',function(){
   reset();var e=ext(),v=PROF[cur].v,L=lenOf(),end=GREEN+e,t=0,last=null,phase='walk',redAt=0,carT=0,x0=xStart(),x=x0,over=false,r=$('#res'),Hh=H();
@@ -426,7 +466,30 @@ $('#go').addEventListener('click',function(){
 window.addEventListener('resize',function(){if(!raf)reset();});
 reset();
 })();
-</script><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+
+/* budget */
+(function(){
+var BOM={proto:[['Microcontrôleur ESP32',1.64],['Module NB-IoT / LTE-M',8],['Relais vers le feu',1.61],['Lecteur NFC (prototypage)',6.99],['Boîtier IP67 / IK10',135.25]],
+ indus:[['Microcontrôleur ESP32',1.64],['Module NB-IoT / LTE-M',144],['Relais ou optocoupleur',4.96],['Lecteur NFC industriel',288],['Boîtier IP67 / IK10',153.5]]};
+var COL=['#8FBF1F','#6FD3E3','#F2C14E','#E4735A','#9aa6af'],mode='proto';
+function f(n){return n.toLocaleString('fr-FR',{minimumFractionDigits:n<10?2:0,maximumFractionDigits:n<10?2:0});}
+function f0(n){return Math.round(n).toLocaleString('fr-FR');}
+function total(){return BOM[mode].reduce(function(a,c){return a+c[1];},0);}
+function render(){
+  var t=total(),b=document.getElementById('bomBar'),l=document.getElementById('bomList');
+  document.getElementById('bomTot').innerHTML=f0(t)+' <small>€ HT</small>';
+  b.innerHTML=BOM[mode].map(function(c,i){return '<i style="background:'+COL[i]+'" data-w="'+(100*c[1]/t)+'"></i>';}).join('');
+  setTimeout(function(){b.querySelectorAll('i').forEach(function(e){e.style.width=e.dataset.w+'%';});},30);
+  l.innerHTML=BOM[mode].map(function(c,i){return '<li><i style="background:'+COL[i]+'"></i>'+c[0]+'<b>'+f(c[1])+' €</b></li>';}).join('');
+  var n=+document.getElementById('nc').value;document.getElementById('ncv').textContent=n;
+  document.getElementById('bomRes').textContent=f0(n*(t+200))+' à '+f0(n*(t+400))+' €';
+}
+document.querySelectorAll('#budget .seg button').forEach(function(x){x.addEventListener('click',function(){document.querySelectorAll('#budget .seg button').forEach(function(y){y.setAttribute('aria-pressed','false');});x.setAttribute('aria-pressed','true');mode=x.dataset.m;render();});});
+document.getElementById('nc').addEventListener('input',render);
+render();
+})();
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
 var box=document.getElementById('v3d'),started=false;
 function fail(m){box.innerHTML='<p>'+m+'</p>';}

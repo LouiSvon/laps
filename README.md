@@ -10,11 +10,11 @@ Projet du défi **Pépite Provence 36h Chrono** (équipe BG5). Ville pilote vis�
 
 | Dossier | Quoi |
 |---|---|
-| [`index.html`](index.html) | Landing page : problème, mini-jeu de traversée, chiffres, solution, boîtier en 3D, collectivité, Salon-de-Provence. |
+| [`index.html`](index.html) | Landing page : problème, mini-jeu de traversée, chiffres, solution, boîtier en 3D, budget, collectivité, Salon-de-Provence. |
 | [`dashboard/`](dashboard/index.html) | Tableau de bord pour la collectivité (une page HTML, sans serveur). |
 | [`modele-3d/`](modele-3d/boitier.stl) | Modèle 3D du boîtier (STL, fait avec OpenSCAD). Aussi converti dans `assets/boitier-stl.js` pour la landing. |
 | [`identite/`](identite/) | Logos (SVG et PNG), couleurs, typographie, charte PDF (version test). |
-| [`data/`](data/donnees-salon-de-provence.md) | Rapport de données sur Salon-de-Provence, chaque chiffre avec sa source. |
+| [`data/`](data/donnees-salon-de-provence.md) | Rapport de données sur Salon-de-Provence, chaque chiffre avec sa source, et la [note de coûts](data/estimation-couts.md) du boîtier. |
 
 ## Lancer en local
 
@@ -33,6 +33,7 @@ La landing charge la police DM Sans (Google Fonts) et la bibliothèque three.js 
 
 - **Réel :** les 18 carrefours à feux (regroupés à la main depuis OpenStreetMap, un minimum), les 43 établissements scolaires (Éducation nationale), les chiffres de population (INSEE), les statistiques nationales citées sur la landing (ONISR, Cerema, LTA Singapour). Les sources sont listées en bas de la landing et dans [`data/`](data/donnees-salon-de-provence.md).
 - **Simulé :** les demandes de temps supplémentaire, les largeurs de chaussée, les durées de vert, les incidents du tableau de bord, et les vitesses de marche du mini-jeu (1,3 m/s adulte, 0,8 m/s senior, 0,8 m/s groupe : hypothèses de démonstration).
+- **Estimé :** les coûts du boîtier (section budget de la landing) sont des estimations de l'équipe, sans devis ni fournisseur cité : ce ne sont pas des prix de vente.
 - **Non vérifié :** le cadre réglementaire pour modifier les temps de feu, le gestionnaire des feux de Salon-de-Provence, l'identification de l'usager sur le réseau local.
 
 ## Technique
