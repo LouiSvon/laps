@@ -38,7 +38,7 @@ La landing charge la police DM Sans (Google Fonts) et la bibliothèque three.js 
 
 ## Technique
 
-HTML, CSS et JavaScript sans framework, un seul fichier par page. Les graphiques du tableau de bord sont du SVG dessiné à la main, avec une simulation déterministe (générateur pseudo-aléatoire à graine fixe). Le modèle 3D est lu avec three.js (`STLLoader`, `OrbitControls`).
+HTML, CSS et JavaScript sans framework, un seul fichier par page. Les graphiques du tableau de bord sont du SVG dessiné à la main, avec une simulation déterministe (générateur pseudo-aléatoire à graine fixe). Le modèle 3D est lu avec three.js (`STLLoader`, `OrbitControls`). Les composants électroniques affichés dans le boîtier (ESP32, module NB-IoT, relais, lecteur NFC) sont des blocs schématiques ajoutés par code : formes et positions indicatives, pas un plan de montage.
 
 ## Données et licences tierces
 

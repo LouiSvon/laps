@@ -164,6 +164,14 @@ footer{background:var(--ink);color:#c8d0d6;padding:40px 0;font-size:14px}
 footer ol{columns:2;gap:36px;padding-left:18px}footer a{color:var(--cyan2)}footer .fl{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
 @media (max-width:860px){.hero .grid,.proof,.two,.big{grid-template-columns:1fr}.steps{grid-template-columns:1fr;gap:28px}.salon{grid-template-columns:1fr 1fr}#dots{display:none}section{padding:64px 0;min-height:0}.hero{min-height:0}footer ol{columns:1}.hero .grid>*,.proof>*,.two>*{min-width:0}.hero .btn{display:block;text-align:center}}
 
+/* 3D */
+#v3d{overflow:hidden}
+.l3{position:absolute;left:0;top:0;pointer-events:none;width:24px;height:24px;margin:-12px 0 0 -12px;background:var(--c);color:#1E2328;border:2px solid #1E2328;font:700 13px var(--mono);display:flex;align-items:center;justify-content:center;transition:opacity .3s;z-index:2}
+.leg{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:14px}
+.leg span{display:flex;gap:8px;align-items:center;font-size:15px;font-weight:700}
+.leg i{width:24px;height:24px;flex:none;background:var(--c);color:#1E2328;border:2px solid #1E2328;font:700 13px var(--mono);display:flex;align-items:center;justify-content:center;font-style:normal}
+.leg em{font:500 13px var(--mono);color:var(--mute);font-style:normal;font-weight:400}
+.bar3{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
 /* budget */
 .dark .seg button{background:transparent;color:#fff;border-color:#fff}.dark .seg button[aria-pressed=true]{background:var(--lime);color:var(--ink);border-color:var(--lime)}
 .bomrow{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:34px;align-items:start}
@@ -247,7 +255,7 @@ footer ol{columns:2;gap:36px;padding-left:18px}footer a{color:var(--cyan2)}foote
 <p class="tag rv"><b>05</b>LE BOÎTIER</p>
 <h2 class="rv d1">Voici le prototype.</h2>
 <p class="lead rv d2">Modèle 3D. Faites-le tourner.</p></div>
-<div class="rv d1"><div id="v3d" aria-label="Modèle 3D du boîtier Laps, à faire tourner à la souris ou au doigt"><p>Chargement du modèle 3D...</p></div><p class="hint">Glisser pour tourner. Nécessite une connexion.</p><div class="pills" style="margin-top:16px"><span>Microcontrôleur ESP32</span><span>Lecteur NFC</span><span>Module NB-IoT / LTE-M</span><span>Relais vers « demande piéton »</span><span>Boîtier IP67 / IK10</span></div></div></div></section>
+<div class="rv d1"><div id="v3d" aria-label="Modèle 3D du boîtier Laps, à faire tourner à la souris ou au doigt"><p>Chargement du modèle 3D...</p></div><div class="bar3"><button class="btn sm" type="button" id="lidBtn">Fermer le boîtier</button><span class="hint" style="margin:0">Glisser pour tourner. Nécessite une connexion.</span></div><p class="hint">Composants schématiques : formes et positions indicatives, pas un plan de montage.</p><div class="leg"><span style="--c:#8FBF1F"><i>1</i>Microcontrôleur ESP32 <em>1,64 €</em></span><span style="--c:#6FD3E3"><i>2</i>Module NB-IoT / LTE-M <em>8,00 €</em></span><span style="--c:#F2C14E"><i>3</i>Relais vers « demande piéton » <em>1,61 €</em></span><span style="--c:#E4735A"><i>4</i>Lecteur NFC <em>6,99 €</em></span><span style="--c:#9aa6af"><i>5</i>Boîtier IP67 / IK10 <em>135 €</em></span></div></div></div></section>
 
 <section id="budget" class="dark"><div class="wrap">
 <p class="tag rv"><b>06</b>LE BUDGET</p>
@@ -504,20 +512,53 @@ function fail(m){box.innerHTML='<p>'+m+'</p>';}
 async function start(){
   if(started)return;started=true;
   try{
-    await new Promise(function(ok,ko){var s=document.createElement('script');s.src='assets/boitier-stl.js';s.onload=ok;s.onerror=ko;document.head.appendChild(s);});
+    await new Promise(function(ok,ko){var sc=document.createElement('script');sc.src='assets/boitier-stl.js';sc.onload=ok;sc.onerror=ko;document.head.appendChild(sc);});
     var THREE=await import('three'),L=await import('three/addons/loaders/STLLoader.js'),O=await import('three/addons/controls/OrbitControls.js');
     var bin=atob(window.BOITIER_B64),buf=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i);
-    var geo=new L.STLLoader().parse(buf.buffer);geo.center();geo.computeVertexNormals();
+    var geo=new L.STLLoader().parse(buf.buffer),pos=geo.attributes.position,nt=pos.count/3,bp=[],lp=[];
+    for(var t=0;t<nt;t++){var cx=(pos.getX(3*t)+pos.getX(3*t+1)+pos.getX(3*t+2))/3,a=cx<85?bp:lp;for(var k=0;k<3;k++)a.push(pos.getX(3*t+k),pos.getY(3*t+k),pos.getZ(3*t+k));}
+    function mk(arr,dx){var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));g.translate(dx,-28.4,-13);g.computeVertexNormals();return g;}
+    var gb=mk(bp,-40.4),gl=mk(lp,-131.2);
     box.innerHTML='';
     var W=box.clientWidth,Hh=box.clientHeight,r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setPixelRatio(Math.min(2,devicePixelRatio));r.setSize(W,Hh);box.appendChild(r.domElement);
     var sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(32,W/Hh,1,2000);
-    var mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x0A7686,roughness:.42,metalness:.15}));mesh.rotation.x=-Math.PI/2;sc.add(mesh);
-    var ed=new THREE.LineSegments(new THREE.EdgesGeometry(geo,35),new THREE.LineBasicMaterial({color:0x1E2328,transparent:true,opacity:.45}));ed.rotation.x=-Math.PI/2;sc.add(ed);
+    var stl=new THREE.Group();stl.rotation.x=-Math.PI/2;sc.add(stl);
+    var cm=new THREE.MeshStandardMaterial({color:0x8c99a4,roughness:.5,metalness:.2});
+    function part(g){var m=new THREE.Mesh(g,cm);m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g,35),new THREE.LineBasicMaterial({color:0x1E2328,transparent:true,opacity:.4})));stl.add(m);return m;}
+    var body=part(gb),lid=part(gl);
+    /* composants (repère du modèle, z vers le haut, cavité x ±38, y ±26, sol à z=-10,5, bord à z=13,5) */
+    var comps=new THREE.Group();stl.add(comps);var items=[];
+    function add(name,price,col,w,d,h,x,y,z,dark){
+      var m=new THREE.Mesh(new THREE.BoxGeometry(w,d,h),new THREE.MeshStandardMaterial({color:col,roughness:.45,metalness:.1,transparent:name==='Lecteur NFC',opacity:name==='Lecteur NFC'?.55:1}));
+      m.position.set(x,y,z+h/2);comps.add(m);
+      m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry),new THREE.LineBasicMaterial({color:0x1E2328,transparent:true,opacity:.5})));
+      if(name)items.push({m:m,name:name,price:price,col:col,top:h/2});return m;}
+    add(null,0,0x1d4d3f,68,44,1.6,0,0,-2.9);                                   /* circuit imprimé */
+    add('Microcontrôleur ESP32','1,64 €',0x8FBF1F,18,25.5,3.1,-24,6,-1.3);
+    add('Module NB-IoT / LTE-M','8,00 €',0x6FD3E3,24,24,3,2,8,-1.3);
+    add('Relais vers le feu','1,61 €',0xF2C14E,15,12,9,26,-12,-1.3);
+    add('Lecteur NFC','6,99 €',0xE4735A,40,28,1.4,0,-2,11.4);                   /* sous le couvercle */
+    items.push({m:body,name:'Boîtier IP67 / IK10',price:'135 €',col:0x9aa6af,top:13,dx:-36,dy:-24,fixed:true});
+    var ov=document.createElement('div');box.appendChild(ov);
+    items.forEach(function(it,ix){var e=document.createElement('div');e.className='l3';e.style.setProperty('--c','#'+('000000'+it.col.toString(16)).slice(-6));e.textContent=String(ix+1);e.title=it.name+' : '+it.price;ov.appendChild(e);it.el=e;});
     sc.add(new THREE.HemisphereLight(0xffffff,0x8899aa,1.1));var dl=new THREE.DirectionalLight(0xffffff,1.6);dl.position.set(120,200,160);sc.add(dl);
-    geo.computeBoundingSphere();var rad=geo.boundingSphere.radius;cam.position.set(rad*1.3,rad*1.0,rad*2.3);
-    var c=new O.OrbitControls(cam,r.domElement);c.enableZoom=false;c.enablePan=false;c.autoRotate=true;c.autoRotateSpeed=2.2;c.enableDamping=true;
+    cam.position.set(95,90,125);
+    var c=new O.OrbitControls(cam,r.domElement);c.target.set(0,12,0);c.enableZoom=false;c.enablePan=false;c.autoRotate=true;c.autoRotateSpeed=1.1;c.enableDamping=true;
+    var open=true,lz=62,btn=document.getElementById('lidBtn');
+    btn.addEventListener('click',function(){open=!open;btn.textContent=open?'Fermer le boîtier':'Ouvrir le boîtier';});
     addEventListener('resize',function(){var w=box.clientWidth,h=box.clientHeight;r.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix();});
-    (function loop(){c.update();r.render(sc,cam);requestAnimationFrame(loop);})();
+    var v=new THREE.Vector3();
+    (function loop(){
+      lz+=((open?62:26.49)-lz)*.09;lid.position.z=lz;comps.visible=open||lz>40;
+      c.update();r.render(sc,cam);
+      var w=box.clientWidth,h=box.clientHeight,show=open&&lz>55;
+      items.forEach(function(it){
+        if(!show){it.el.style.opacity=0;return;}
+        if(it.fixed)v.set(it.dx,it.dy,it.top);else v.set(0,0,it.top);
+        it.m.localToWorld(v);v.project(cam);
+        it.el.style.opacity=1;it.el.style.transform='translate('+((v.x*.5+.5)*w)+'px,'+((-v.y*.5+.5)*h)+'px)';
+      });
+      requestAnimationFrame(loop);})();
   }catch(e){fail('Modèle 3D indisponible (connexion nécessaire). Fichier : assets/boitier-stl.js');console.error(e);}
 }
 new IntersectionObserver(function(es,o){if(es[0].isIntersecting){o.disconnect();start();}},{rootMargin:'300px'}).observe(box);
